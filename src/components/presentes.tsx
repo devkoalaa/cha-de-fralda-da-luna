@@ -157,7 +157,7 @@ export default function Presentes() {
 
             {modalVisible && presenteSelecionado && (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-8 rounded-md w-1/3">
+                    <div className="bg-white p-8 rounded-md w-80%">
                         <h2 className="text-xl font-bold mb-4">Confirmar Presentear</h2>
                         <div className="mb-4">
                             <p className="font-bold">Nome:</p>
