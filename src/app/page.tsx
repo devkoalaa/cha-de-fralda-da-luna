@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center min-h-screen border-marronzim border-solid border-8 rounded-2xl lg:bg-cover lg:bg-center" style={{ backgroundImage: 'url(/images/background.png)' }}>
       <div className="flex flex-col items-center justify-between font-[family-name:var(--font-geist-sans)] shadow-2xl rounded-xl w-full m-0.8">
-        <div className="top-0 left-0 w-full flex flex-col items-center z-50 px-9">
+        <div className="top-0 left-0 w-full flex flex-col items-center px-9">
           <Image
             src="/images/lunaLogo.png"
             alt="Luna logo"
