@@ -5,8 +5,8 @@ import { toast, ToastContainer } from "react-toastify";
 interface PresencaData {
     nome: string;
     telefone: string;
-    acompanhantesAdultos: number;
-    acompanhantesCriancas: number;
+    acompanhantesAdultos: number | null;
+    acompanhantesCriancas: number | null;
 }
 
 export default function Presenca({ acao, tag }: { acao: (tela: string) => void, tag: string }) {
@@ -16,8 +16,8 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
     const [formData, setFormData] = useState<PresencaData>({
         nome: "",
         telefone: "",
-        acompanhantesAdultos: 0,
-        acompanhantesCriancas: 0,
+        acompanhantesAdultos: null,
+        acompanhantesCriancas: null,
     });
 
     useEffect(() => {
@@ -75,8 +75,11 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
         localStorage.setItem("luna-storage", JSON.stringify(formData))
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/confirmPresence`, {
+            headers: {
+                "Content-Type": 'application/json'
+            },
             method: "POST",
-            body: JSON.stringify(formData)
+            body: JSON.stringify(formData),
         })
 
         console.log(response)
@@ -101,7 +104,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
     };
 
     return (
-        <div className="flex flex-col items-center justify-start min-h-screen px-4 gap-8">
+        <div className="flex flex-col items-center justify-start min-h-screen px-4 gap-3">
             <ToastContainer />
             {/* Título */}
             <h1 className="text-3xl font-bold text-black text-center">
@@ -171,15 +174,16 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                 ? <label className="block mb-1 text-black font-medium">
                                     {presenca.acompanhantesAdultos}
                                 </label>
-                                : <input
+                                : <InputMask
                                     name="acompanhantesAdultos"
-                                    max={10}
-                                    className="w-full px-3 py-2 border rounded-md text-black"
-                                    type="number"
+                                    className="w-full px-3 py-2 border rounded-md text-black text-medium"
+                                    mask="__"
                                     onChange={handleChange}
+                                    replacement={{ _: /\d/ }}
                                     placeholder="Adultos"
                                     required
-                                    value={formData.acompanhantesAdultos}
+                                    min={0}
+                                    max={10}
                                 />}
                         </div>
                         <div className="w-1/2">
@@ -190,45 +194,51 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                 ? <label className="block mb-1 text-black font-medium">
                                     {presenca.acompanhantesCriancas}
                                 </label>
-                                : <input
+                                : <InputMask
                                     name="acompanhantesCriancas"
-                                    max={10}
-                                    className="w-full px-3 py-2 border rounded-md text-black"
-                                    type="number"
+                                    className="w-full px-3 py-2 border rounded-md text-black text-medium"
+                                    mask="__"
                                     onChange={handleChange}
+                                    replacement={{ _: /\d/ }}
                                     placeholder="Crianças"
                                     required
-                                    value={formData.acompanhantesCriancas}
+                                    min={0}
+                                    max={10}
                                 />}
                         </div>
                     </div>
+
                 </div>
 
                 {/* Presentes */}
-                {presentes && <div>
-                    <label className="block mb-1 text-black font-bold">
-                        Presentes
-                    </label>
-                    <label className="block mb-1 text-black">
-                        {presentes}
-                    </label>
-                </div>}
+                {
+                    presentes && <div>
+                        <label className="block mb-1 text-black font-bold">
+                            Presentes
+                        </label>
+                        <label className="block mb-1 text-black">
+                            {presentes}
+                        </label>
+                    </div>
+                }
 
                 {/* Botão de Enviar */}
-                {presenca
-                    ? <button onClick={() => acao('presentes')}
-                        className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
-                    >
-                        Presentear
-                    </button>
-                    : <button
-                        type="submit"
-                        className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
-                    >
-                        Confirmar
-                    </button>
+                {
+                    presenca
+                        ? <button onClick={() => acao('presentes')}
+                            className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
+                        >
+                            Presentear
+                        </button>
+                        : <button
+                            type="submit"
+                            className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
+                        >
+                            Confirmar
+                        </button>
                 }
-                {presenca &&
+                {
+                    presenca &&
                     <button type="button" onClick={() => {
                         localStorage.removeItem('luna-storage')
                         location.reload()
