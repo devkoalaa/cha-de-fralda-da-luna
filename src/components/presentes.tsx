@@ -28,8 +28,7 @@ export default function Presentes() {
         const getGifts = async () => {
             try {
                 console.log(`${process.env.NEXT_PUBLIC_URL_API}/gifts`)
-                const response = await fetch('https://baco-api.vercel.app/gifts')
-                // const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/gifts`)
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/gifts`)
 
                 const data = await response.json()
 
