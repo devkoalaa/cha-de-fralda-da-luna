@@ -56,12 +56,14 @@ export default function Presentes() {
     const abrirModal = (presente: Presente) => {
         setPresenteSelecionado(presente);
         setModalVisible(true);
+        document.body.style.overflow = 'hidden';
     };
 
     const fecharModal = () => {
         setModalVisible(false);
         setPresenteSelecionado(null);
         setQuantidadePresentear(1);
+        document.body.style.overflow = 'auto';
     };
 
     const confirmarPresentear = () => {
@@ -104,8 +106,17 @@ export default function Presentes() {
 
             {modalVisible && presenteSelecionado && (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-8 rounded-md w-80%">
-                        <h2 className="text-xl font-bold mb-4">Confirmar Presentear</h2>
+                    <div className="items-center justify-center bg-white p-8 rounded-md lg:w-[40%] w-[80%]">
+                        <h2 className="text-xl font-bold mb-4">Confirmar Presente</h2>
+                        <div className="mb-4 flex justify-center">
+                            <Image
+                                src={presenteSelecionado.imagem}
+                                alt={presenteSelecionado.nome}
+                                width={200}
+                                height={200}
+                                className="rounded-md"
+                            />
+                        </div>
                         <div className="mb-4">
                             <p className="font-bold">Nome:</p>
                             <p>{presenteSelecionado.nome}</p>
