@@ -5,14 +5,20 @@ import { toast, ToastContainer } from "react-toastify";
 interface PresencaData {
     nome: string;
     telefone: string;
-    acompanhantesAdultos: string;
-    acompanhantesCriancas: string;
+    acompanhantesAdultos: number;
+    acompanhantesCriancas: number;
 }
 
 export default function Presenca({ acao, tag }: { acao: (tela: string) => void, tag: string }) {
     const [presenca, setPresenca] = useState<PresencaData | null>(null)
     const [presentes, setPresentes] = useState(null)
     const [modalVisible, setModalVisible] = useState(false);
+    const [formData, setFormData] = useState<PresencaData>({
+        nome: "",
+        telefone: "",
+        acompanhantesAdultos: 0,
+        acompanhantesCriancas: 0,
+    });
 
     useEffect(() => {
         if (tag === 'presenca-e') toast('Você deve confirmar presença!',
@@ -50,18 +56,17 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
         }
     }, [])
 
-    const [formData, setFormData] = useState<PresencaData>({
-        nome: "",
-        telefone: "",
-        acompanhantesAdultos: "",
-        acompanhantesCriancas: "",
-    });
-
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement>
     ) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: name === "acompanhantesAdultos" || name === "acompanhantesCriancas"
+                ? Number(value)
+                : value,
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -166,12 +171,12 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                 ? <label className="block mb-1 text-black font-medium">
                                     {presenca.acompanhantesAdultos}
                                 </label>
-                                : <InputMask
+                                : <input
                                     name="acompanhantesAdultos"
-                                    className="w-full px-3 py-2 border rounded-md text-medium"
-                                    mask="__"
+                                    max={10}
+                                    className="w-full px-3 py-2 border rounded-md text-black"
+                                    type="number"
                                     onChange={handleChange}
-                                    replacement={{ _: /\d/ }}
                                     placeholder="Adultos"
                                     required
                                     value={formData.acompanhantesAdultos}
@@ -185,12 +190,12 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                 ? <label className="block mb-1 text-black font-medium">
                                     {presenca.acompanhantesCriancas}
                                 </label>
-                                : <InputMask
+                                : <input
                                     name="acompanhantesCriancas"
+                                    max={10}
                                     className="w-full px-3 py-2 border rounded-md text-black"
-                                    mask="__"
+                                    type="number"
                                     onChange={handleChange}
-                                    replacement={{ _: /\d/ }}
                                     placeholder="Crianças"
                                     required
                                     value={formData.acompanhantesCriancas}
