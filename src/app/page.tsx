@@ -3,14 +3,26 @@ import Convite from "@/components/convite";
 import Evento from '@/components/evento';
 import Presenca from "@/components/presenca";
 import Presentes from "@/components/presentes";
-import { AnimatePresence, motion } from 'framer-motion'; // Importe o AnimatePresence
+import { AnimatePresence, motion } from 'framer-motion';
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoMenu } from "react-icons/io5";
 
 export default function Home() {
-  const [screenSelected, setScreenSelected] = useState('home');
+  const [screenSelected, setScreenSelected] = useState(() => {
+    const lastScreen = localStorage.getItem('luna-storage-last-screen')
+    if (lastScreen) return lastScreen
+    return 'home'
+  });
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('luna-storage-last-screen', screenSelected)
+  }, [screenSelected])
 
   return (
     <div className="flex items-center justify-center min-h-screen border-marronzim border-solid border-8 rounded-2xl lg:bg-cover lg:bg-center" style={{ backgroundImage: 'url(/images/background.png)' }}>
@@ -41,7 +53,7 @@ export default function Home() {
               Lista de Presentes
             </div>
             <div
-              className={`flex-auto text-center text-white px-2 cursor-pointer hover:brightness-75 relative ${screenSelected === 'presenca' ? 'after:content-[""] after:absolute after:bottom-[-8px] after:left-0 after:right-0 after:h-[2px] after:bg-white' : ''}`}
+              className={`flex-auto text-center text-white px-2 cursor-pointer hover:brightness-75 relative ${screenSelected.startsWith('presenca') ? 'after:content-[""] after:absolute after:bottom-[-8px] after:left-0 after:right-0 after:h-[2px] after:bg-white' : ''}`}
               onClick={() => setScreenSelected('presenca')}
             >
               Confirmar Presença
@@ -55,13 +67,16 @@ export default function Home() {
           </div>
 
           {/* Menu colapsado */}
-          <div className="lg:hidden w-full flex items-center justify-between bg-marronzim h-10 rounded-md shadow-lg select-none"
-            onClick={() => setMenuOpen(!menuOpen)}>
+          <div
+            className="lg:hidden w-full flex items-center justify-between bg-marronzim h-10 rounded-md shadow-lg select-none"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
             <button
-              className="text-white px-3"
+              className="text-white px-3 flex items-center gap-2"
               aria-label="Toggle menu"
             >
               <IoMenu size={30} />
+              <span className="font-bold">Menu</span>
             </button>
           </div>
 
@@ -88,7 +103,7 @@ export default function Home() {
                   Lista de Presentes
                 </div>
                 <div
-                  className={`w-full text-center text-white px-2 py-2 cursor-pointer ${screenSelected === 'presenca' ? 'bg-verde' : ''}`}
+                  className={`w-full text-center text-white px-2 py-2 cursor-pointer ${screenSelected.startsWith('presenca') ? 'bg-verde' : ''}`}
                   onClick={() => setScreenSelected('presenca')}
                 >
                   Confirmar Presença
@@ -110,11 +125,11 @@ export default function Home() {
           )}
 
           {screenSelected === 'presentes' && (
-            <Presentes />
+            <Presentes acao={setScreenSelected} />
           )}
 
-          {screenSelected === 'presenca' && (
-            <Presenca />
+          {screenSelected.startsWith('presenca') && (
+            <Presenca acao={setScreenSelected} tag={screenSelected} />
           )}
 
           {screenSelected === 'evento' && (

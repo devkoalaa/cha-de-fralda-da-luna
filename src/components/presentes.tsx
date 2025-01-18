@@ -1,155 +1,216 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import Loading from "./Loading";
 
 interface Presente {
-    nome: string,
-    descricao: string,
-    imagem: string,
-    quantidade: number,
-    quantidadeComprado: number,
+    id: string;
+    nome: string;
+    descricao: string;
+    imagem: string;
+    quantidade: number;
+    quantidadeComprado: number;
 }
 
 interface GiftResponse {
-    name: string,
-    description: string,
-    imagem: string,
-    quantity: number,
-    quantityPurchased: number,
-    image: string,
+    id: string;
+    name: string;
+    description: string;
+    imagem: string;
+    quantity: number;
+    quantityPurchased: number;
+    image: string;
 }
 
-export default function Presentes() {
+export default function Presentes({ acao }: { acao: (tela: string) => void }) {
     const [modalVisible, setModalVisible] = useState(false);
     const [presenteSelecionado, setPresenteSelecionado] = useState<Presente | null>(null);
     const [quantidadePresentear, setQuantidadePresentear] = useState(1);
-    const [presentes, setPresentes] = useState<Presente[]>([])
+    const [presentes, setPresentes] = useState<Presente[]>([]);
+    const [presenca, setPresenca] = useState();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const getGifts = async () => {
-            try {
-                console.log(`${process.env.NEXT_PUBLIC_URL_API}/gifts`)
-                const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/gifts`)
+        const result = localStorage.getItem("luna-storage");
 
-                const data = await response.json()
-
-                const gifts: Presente[] = data.map((presente: GiftResponse) => {
-                    const novoPresente: Presente = {
-                        nome: presente.name,
-                        descricao: presente.description,
-                        quantidade: presente.quantity,
-                        quantidadeComprado: presente.quantityPurchased,
-                        imagem: presente.image
-                    }
-
-                    return novoPresente
-                })
-
-                setPresentes(gifts)
-            } catch (error) {
-                console.error("Erro ao recuperar presentes", error)
-            }
+        if (result) {
+            setPresenca(JSON.parse(result));
         }
 
-        getGifts()
-    }, [])
+        const getGifts = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/gifts`);
+                const data = await response.json();
+
+                const gifts: Presente[] = data.map((presente: GiftResponse) => ({
+                    id: presente.id,
+                    nome: presente.name,
+                    descricao: presente.description,
+                    quantidade: presente.quantity,
+                    quantidadeComprado: presente.quantityPurchased,
+                    imagem: presente.image,
+                }));
+
+                setPresentes(gifts);
+            } catch (error) {
+                console.error("Erro ao recuperar presentes", error);
+                toast('Erro ao recuperar presentes',
+                    {
+                        theme: "colored",
+                        type: "error",
+                        autoClose: 10000,
+                        position: "bottom-center"
+                    })
+            } finally {
+                setLoading(false); // Finaliza o carregamento
+            }
+        };
+
+        getGifts();
+    }, []);
 
     const abrirModal = (presente: Presente) => {
         setPresenteSelecionado(presente);
         setModalVisible(true);
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
     };
 
     const fecharModal = () => {
         setModalVisible(false);
         setPresenteSelecionado(null);
         setQuantidadePresentear(1);
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = "auto";
     };
 
     const confirmarPresentear = () => {
-        if (presenteSelecionado) {
-            // Lógica de confirmação, como diminuir a quantidade ou qualquer outra ação
-            console.log(`Presentear ${quantidadePresentear} de ${presenteSelecionado.nome}`);
+        if (!presenteSelecionado) return;
+
+        const result = localStorage.getItem("luna-storage-gifts");
+        const presentesUsuario = result ? JSON.parse(result) : [];
+
+        let presenteExiste = false;
+
+        const newArrPresentes = presentesUsuario.map((presentePresenteado: { presente: Presente; quantidadePresenteado: number }) => {
+            if (presentePresenteado.presente.id === presenteSelecionado.id) {
+                presenteExiste = true;
+                return {
+                    ...presentePresenteado,
+                    quantidadePresenteado: presentePresenteado.quantidadePresenteado + quantidadePresentear,
+                };
+            }
+            return presentePresenteado;
+        });
+
+        if (!presenteExiste) {
+            newArrPresentes.push({
+                presente: presenteSelecionado,
+                quantidadePresenteado: quantidadePresentear,
+            });
         }
+
+        localStorage.setItem("luna-storage-gifts", JSON.stringify(newArrPresentes));
+
+        if (presenca) {
+            toast("Presenteado!", {
+                theme: "colored",
+                type: "success",
+                style: { backgroundColor: "#725d4e" }, // Marronzim
+                autoClose: 10000,
+                position: "bottom-center",
+            });
+        } else {
+            acao("presenca-e");
+        }
+
         fecharModal();
     };
 
     return (
-        <div className="flex flex-col items-center justify-start min-h-screen px-4 gap-8">
+        <div className="flex flex-col items-center justify-start min-h-screen px-4 gap-3">
             <h1 className="text-3xl font-bold text-black text-center">Lista de Presentes</h1>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-                {presentes.map((presente, i) => (
-                    <div
-                        key={i}
-                        className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 hover:scale-105"
-                    >
-                        <Image
-                            src={presente.imagem}
-                            alt={`Presente ${i + 1}`}
-                            width={200}
-                            height={200}
-                            className="rounded-md"
-                        />
-                        <h3 className="mt-4 text-lg text-black font-bold">{presente.nome}</h3>
-                        <p className="text-black mb-4">{presente.descricao}</p>
-                        <p className="text-black mb-4">Quantidade: {presente.quantidade}</p>
-                        <button
-                            onClick={() => abrirModal(presente)}
-                            className="bg-verde text-white py-2 px-4 rounded-md hover:bg-verde-escuro transition-colors duration-200"
+            <ToastContainer />
+            {loading ? (
+                <Loading />
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+                    {presentes.map((presente, i) => (
+                        <div
+                            key={i}
+                            className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 hover:scale-105"
                         >
-                            Presentear
-                        </button>
-                    </div>
-                ))}
-            </div>
-
-            {modalVisible && presenteSelecionado && (
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                    <div className="items-center justify-center bg-white p-8 rounded-md lg:w-[40%] w-[80%]">
-                        <h2 className="text-xl font-bold mb-4">Confirmar Presente</h2>
-                        <div className="mb-4 flex justify-center">
                             <Image
-                                src={presenteSelecionado.imagem}
-                                alt={presenteSelecionado.nome}
+                                src={presente.imagem}
+                                alt={`Presente ${i + 1}`}
                                 width={200}
                                 height={200}
                                 className="rounded-md"
                             />
+                            <h3 className="mt-4 text-lg text-black font-bold">{presente.nome}</h3>
+                            <p className="text-black mb-4">{presente.descricao.length < 100 ? presente.descricao : `${presente.descricao.substring(0, 30)}...`}</p>
+                            <p className="text-black mb-4">Quantidade: {presente.quantidade}</p>
+                            <button
+                                onClick={() => abrirModal(presente)}
+                                className="bg-marronzim text-white py-2 px-4 rounded-md hover:bg-marronzim-escuro transition-colors duration-200"
+                            >
+                                Presentear
+                            </button>
                         </div>
-                        <div className="mb-4">
-                            <p className="font-bold">Nome:</p>
-                            <p>{presenteSelecionado.nome}</p>
+                    ))}
+                </div>
+            )}
+
+            {modalVisible && presenteSelecionado && (
+                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+                    <div className="bg-white p-4 lg:p-6 rounded-lg shadow-lg lg:w-1/3 md:w-1/2 w-11/12">
+                        <h2 className="text-xl font-bold text-center mb-4">Confirmar Presente</h2>
+
+                        <div className="mb-4 flex justify-center">
+                            <Image
+                                src={presenteSelecionado.imagem}
+                                alt={presenteSelecionado.nome}
+                                width={150}
+                                height={150}
+                                className="rounded-md"
+                            />
                         </div>
-                        <div className="mb-4">
-                            <p className="font-bold">Descrição:</p>
-                            <p>{presenteSelecionado.descricao}</p>
+
+                        <div className="mb-2">
+                            <p className="font-bold text-gray-700">Nome:</p>
+                            <p className="text-gray-600 text-sm">{presenteSelecionado.nome}</p>
                         </div>
-                        <div className="mb-4">
-                            <p className="font-bold">Quantidade disponível:</p>
-                            <p>{presenteSelecionado.quantidade}</p>
+
+                        <div className="mb-2">
+                            <p className="font-bold text-gray-700">Descrição:</p>
+                            <p className="text-gray-600 text-sm">{presenteSelecionado.descricao}</p>
                         </div>
+
+                        <div className="mb-2">
+                            <p className="font-bold text-gray-700">Quantidade disponível:</p>
+                            <p className="text-gray-600 text-sm">{presenteSelecionado.quantidade}</p>
+                        </div>
+
                         <div className="mb-4">
-                            <label className="block font-bold">Quantidade a presentear:</label>
+                            <label className="block font-bold text-gray-700 mb-1 text-sm">Quantidade a presentear:</label>
                             <input
                                 type="number"
                                 value={quantidadePresentear}
                                 onChange={(e) => setQuantidadePresentear(Number(e.target.value))}
                                 min="1"
                                 max={presenteSelecionado.quantidade}
-                                className="border p-2 rounded-md"
+                                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde focus:border-verde"
                             />
                         </div>
-                        <div className="flex justify-between">
+
+                        <div className="flex justify-end gap-3">
                             <button
                                 onClick={fecharModal}
-                                className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600"
+                                className="bg-gray-500 text-white text-sm py-2 px-3 rounded-md hover:bg-gray-600 transition"
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={confirmarPresentear}
-                                className="bg-verde text-white py-2 px-4 rounded-md hover:bg-verde-escuro"
+                                className="bg-verde text-white text-sm py-2 px-3 rounded-md hover:bg-verde-escuro transition"
                             >
                                 Confirmar
                             </button>

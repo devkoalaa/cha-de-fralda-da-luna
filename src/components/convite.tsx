@@ -93,7 +93,7 @@ export default function Convite() {
                     </div>
                 </Slider>
             </div>
-            <h1 className="text-2xl font-bold text-verde mt-1">É hora de celebrar!</h1>
+            <h1 className="text-3xl font-bold text-marrozim mt-3">É hora de celebrar!</h1>
             <p className="text-lg text-gray-700 mt-4">
                 Com imensa alegria, convidamos vocês para o Chá de Bebê da <span className="font-bold">Luna</span>.
             </p>

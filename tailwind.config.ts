@@ -13,7 +13,8 @@ export default {
         foreground: "var(--foreground)",
         verde: "#83ab89",
         "verde-escuro": "#698a6e",
-        marronzim: '#725d4e'
+        marronzim: '#725d4e',
+        'marronzim-escuro': '#584a40'
       },
     },
   },
