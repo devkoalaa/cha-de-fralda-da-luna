@@ -10,13 +10,16 @@ import { IoMenu } from "react-icons/io5";
 
 export default function Home() {
   const [screenSelected, setScreenSelected] = useState(() => {
-    const lastScreen = localStorage.getItem('luna-storage-last-screen')
-    if (lastScreen) return lastScreen
+    // const lastScreen = localStorage.getItem('luna-storage-last-screen')
+    // if (lastScreen) return lastScreen
     return 'home'
   });
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    const lastScreen = localStorage.getItem('luna-storage-last-screen')
+    if (lastScreen) setScreenSelected(lastScreen)
+
     window.scrollTo(0, 0)
   }, [])
 
