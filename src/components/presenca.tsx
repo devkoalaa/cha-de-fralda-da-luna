@@ -69,7 +69,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
 
         localStorage.setItem("luna-storage", JSON.stringify(formData))
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/confirmPresence`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/confirmPresence`, {
             method: "POST",
             body: JSON.stringify(formData)
         })
@@ -88,7 +88,11 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
         setModalVisible(false);
         document.body.style.overflow = "auto";
 
-        if (encaminhar) acao('presentes')
+        if (encaminhar) {
+            acao('presentes')
+        } else {
+            location.reload()
+        }
     };
 
     return (
