@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { InputMask } from '@react-input/mask';
 
 export default function Presenca() {
     const [formData, setFormData] = useState({
@@ -51,15 +52,15 @@ export default function Presenca() {
                     <label className="block mb-1 text-black font-medium">
                         Telefone
                     </label>
-                    <input
-                        type="tel"
+                    <InputMask
                         name="telefone"
-                        placeholder="(99) 99999-9999"
-                        value={formData.telefone}
-                        onChange={handleChange}
-                        pattern="^\(\d{2}\)\s\d{4,5}-\d{4}$"
-                        required
                         className="w-full px-3 py-2 border rounded-md text-black"
+                        mask="(__) _____-____"
+                        onChange={handleChange}
+                        replacement={{ _: /\d/ }}
+                        placeholder="(99) 99999-9999"
+                        required
+                        value={formData.telefone}
                     />
                 </div>
 
@@ -73,26 +74,30 @@ export default function Presenca() {
                             <label className="block mb-1 text-black font-medium">
                                 Adultos
                             </label>
-                            <input
-                                type="number"
+                            <InputMask
                                 name="acompanhantesAdultos"
-                                placeholder="Adultos"
-                                value={formData.acompanhantesAdultos}
-                                onChange={handleChange}
                                 className="w-full px-3 py-2 border rounded-md text-black"
+                                mask="__"
+                                onChange={handleChange}
+                                replacement={{ _: /\d/ }}
+                                placeholder="Adultos"
+                                required
+                                value={formData.acompanhantesAdultos}
                             />
                         </div>
                         <div className="w-1/2">
                             <label className="block mb-1 text-black font-medium">
                                 Crianças
                             </label>
-                            <input
-                                type="number"
+                            <InputMask
                                 name="acompanhantesCriancas"
-                                placeholder="Crianças"
-                                value={formData.acompanhantesCriancas}
-                                onChange={handleChange}
                                 className="w-full px-3 py-2 border rounded-md text-black"
+                                mask="__"
+                                onChange={handleChange}
+                                replacement={{ _: /\d/ }}
+                                placeholder="Crianças"
+                                required
+                                value={formData.acompanhantesCriancas}
                             />
                         </div>
                     </div>

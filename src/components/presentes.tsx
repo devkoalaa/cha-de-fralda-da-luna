@@ -1,110 +1,56 @@
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Presente {
     nome: string,
     descricao: string,
     imagem: string,
     quantidade: number,
+    quantidadeComprado: number,
 }
 
-const presentes: Presente[] = [
-    {
-        nome: "Presente 1",
-        descricao: "Descrição do presente 1",
-        imagem: "/images/fralda.png",
-        quantidade: 5,
-    },
-    {
-        nome: "Presente 2",
-        descricao: "Descrição do presente 2",
-        imagem: "/images/fralda.png",
-        quantidade: 3,
-    },
-    {
-        nome: "Presente 3",
-        descricao: "Descrição do presente 3",
-        imagem: "/images/fralda.png",
-        quantidade: 8,
-    },
-    {
-        nome: "Presente 4",
-        descricao: "Descrição do presente 4",
-        imagem: "/images/fralda.png",
-        quantidade: 7,
-    },
-    {
-        nome: "Presente 5",
-        descricao: "Descrição do presente 5",
-        imagem: "/images/fralda.png",
-        quantidade: 4,
-    },
-    {
-        nome: "Presente 6",
-        descricao: "Descrição do presente 6",
-        imagem: "/images/fralda.png",
-        quantidade: 6,
-    },
-    {
-        nome: "Presente 7",
-        descricao: "Descrição do presente 7",
-        imagem: "/images/fralda.png",
-        quantidade: 2,
-    },
-    {
-        nome: "Presente 8",
-        descricao: "Descrição do presente 8",
-        imagem: "/images/fralda.png",
-        quantidade: 10,
-    },
-    {
-        nome: "Presente 9",
-        descricao: "Descrição do presente 9",
-        imagem: "/images/fralda.png",
-        quantidade: 12,
-    },
-    {
-        nome: "Presente 10",
-        descricao: "Descrição do presente 10",
-        imagem: "/images/fralda.png",
-        quantidade: 15,
-    },
-    {
-        nome: "Presente 11",
-        descricao: "Descrição do presente 11",
-        imagem: "/images/fralda.png",
-        quantidade: 9,
-    },
-    {
-        nome: "Presente 12",
-        descricao: "Descrição do presente 12",
-        imagem: "/images/fralda.png",
-        quantidade: 4,
-    },
-    {
-        nome: "Presente 13",
-        descricao: "Descrição do presente 13",
-        imagem: "/images/fralda.png",
-        quantidade: 3,
-    },
-    {
-        nome: "Presente 14",
-        descricao: "Descrição do presente 14",
-        imagem: "/images/fralda.png",
-        quantidade: 6,
-    },
-    {
-        nome: "Presente 15",
-        descricao: "Descrição do presente 15",
-        imagem: "/images/fralda.png",
-        quantidade: 8,
-    },
-];
+interface GiftResponse {
+    name: string,
+    description: string,
+    imagem: string,
+    quantity: number,
+    quantityPurchased: number,
+    image: string,
+}
 
 export default function Presentes() {
     const [modalVisible, setModalVisible] = useState(false);
     const [presenteSelecionado, setPresenteSelecionado] = useState<Presente | null>(null);
     const [quantidadePresentear, setQuantidadePresentear] = useState(1);
+    const [presentes, setPresentes] = useState<Presente[]>([])
+
+    useEffect(() => {
+        const getGifts = async () => {
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/gifts`)
+
+                const data = await response.json()
+
+                const gifts: Presente[] = data.map((presente: GiftResponse) => {
+                    const novoPresente: Presente = {
+                        nome: presente.name,
+                        descricao: presente.description,
+                        quantidade: presente.quantity,
+                        quantidadeComprado: presente.quantityPurchased,
+                        imagem: presente.image
+                    }
+
+                    return novoPresente
+                })
+
+                setPresentes(gifts)
+            } catch (error) {
+                console.error("Erro ao recuperar presentes", error)
+            }
+        }
+
+        getGifts()
+    }, [])
 
     const abrirModal = (presente: Presente) => {
         setPresenteSelecionado(presente);

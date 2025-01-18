@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-input/mask": "^2.0.4",
     "framer-motion": "^11.18.1",
     "next": "15.1.5",
     "react": "^19.0.0",
