@@ -64,10 +64,17 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         localStorage.setItem("luna-storage", JSON.stringify(formData))
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/confirmPresence`, {
+            method: "POST",
+            body: JSON.stringify(formData)
+        })
+
+        console.log(response)
 
         abrirModal()
     };
@@ -212,37 +219,49 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                         Confirmar
                     </button>
                 }
+                {presenca &&
+                    <button type="button" onClick={() => {
+                        localStorage.removeItem('luna-storage')
+                        location.reload()
+                    }}
+                        className="w-full px-4 py-2 border rounded-md bg-red-700 text-white font-medium"
+                    >
+                        Limpar
+                    </button>
+                }
             </form >
 
-            {modalVisible && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-                    <div className="bg-white p-8 rounded-lg shadow-lg lg:w-1/3 md:w-1/2 w-11/12">
-                        <h2 className="text-2xl font-bold text-center mb-4">Sua presença foi confirmada com sucesso!</h2>
-                        <div className="text-center mb-4">
-                            <p className="font-medium text-gray-700">
-                                Obrigado por confirmar presença! Mal posso esperar para compartilhar este momento especial com você!
-                            </p>
-                        </div>
-                        <div className="text-center mb-4">
-                            <p className="font-medium text-gray-700">Que tal aproveitar para nos presentear!</p>
-                        </div>
-                        <div className="flex justify-center gap-4">
-                            <button
-                                onClick={() => fecharModal(false)}
-                                className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={() => fecharModal(true)}
-                                className="bg-verde text-white py-2 px-4 rounded-md hover:bg-verde-escuro-90 transition"
-                            >
-                                Presentear
-                            </button>
+            {
+                modalVisible && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+                        <div className="bg-white p-8 rounded-lg shadow-lg lg:w-1/3 md:w-1/2 w-11/12">
+                            <h2 className="text-2xl font-bold text-center mb-4">Sua presença foi confirmada com sucesso!</h2>
+                            <div className="text-center mb-4">
+                                <p className="font-medium text-gray-700">
+                                    Obrigado por confirmar presença! Mal posso esperar para compartilhar este momento especial com você!
+                                </p>
+                            </div>
+                            <div className="text-center mb-4">
+                                <p className="font-medium text-gray-700">Que tal aproveitar para nos presentear!</p>
+                            </div>
+                            <div className="flex justify-center gap-4">
+                                <button
+                                    onClick={() => fecharModal(false)}
+                                    className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={() => fecharModal(true)}
+                                    className="bg-verde text-white py-2 px-4 rounded-md hover:bg-verde-escuro-90 transition"
+                                >
+                                    Presentear
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div >
     );
 }

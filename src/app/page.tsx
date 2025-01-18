@@ -25,6 +25,8 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.setItem('luna-storage-last-screen', screenSelected)
+
+    window.scrollTo(0, 0)
   }, [screenSelected])
 
   return (
