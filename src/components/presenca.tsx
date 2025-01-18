@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { toastError, toastSuccess } from "@/utils/toastOptions";
 import { InputMask } from '@react-input/mask';
+import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 interface PresencaData {
@@ -9,9 +11,37 @@ interface PresencaData {
     acompanhantesCriancas: number | null;
 }
 
+interface PresencaDataResponse {
+    id: string,
+    name: string,
+    phone: string,
+    acompanhantesAdultos: number,
+    acompanhantesCriancas: number,
+    selectedGifts: [
+        {
+            id: string,
+            presenceId: string,
+            giftId: string,
+            quantity: 1
+        }
+    ]
+}
+
+interface PresentePresenteado {
+    presente: {
+        id: string;
+        nome: string;
+        descricao: string;
+        imagem: string;
+        quantidade: number;
+        quantidadeComprado: number;
+    },
+    quantidadePresenteado: number
+}
+
 export default function Presenca({ acao, tag }: { acao: (tela: string) => void, tag: string }) {
     const [presenca, setPresenca] = useState<PresencaData | null>(null)
-    const [presentes, setPresentes] = useState(null)
+    const [presentesString, setPresentesString] = useState(null)
     const [modalVisible, setModalVisible] = useState(false);
     const [formData, setFormData] = useState<PresencaData>({
         nome: "",
@@ -21,21 +51,14 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
     });
 
     useEffect(() => {
-        if (tag === 'presenca-e') toast('Você deve confirmar presença!',
-            {
-                theme: "colored",
-                type: "error",
-                autoClose: 10000,
-                position: "bottom-center"
-            }
-        )
+        if (tag === 'presenca-e') toast('Você deve confirmar presença!', toastError);
 
-        const giftsLocal = localStorage.getItem("luna-storage-gifts")
+        const giftsLocal = localStorage.getItem("luna-storage-gifts");
         if (giftsLocal) {
-            const dataGifts = JSON.parse(giftsLocal)
-            setPresentes(() => {
+            const dataGifts = JSON.parse(giftsLocal);
+            setPresentesString(() => {
                 const textoPresentes = dataGifts
-                    .map((presentePresenteado: { presente: { nome: string }, quantidadePresenteado: number }) => {
+                    .map((presentePresenteado: PresentePresenteado) => {
                         const { nome } = presentePresenteado.presente;
                         const { quantidadePresenteado } = presentePresenteado;
 
@@ -45,20 +68,91 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                     })
                     .join(', ');
 
-                return textoPresentes
-            })
+                return textoPresentes;
+            });
         }
 
-        const presencaLocal = localStorage.getItem("luna-storage")
-        if (presencaLocal) {
-            const dataPresenca = JSON.parse(presencaLocal)
-            setPresenca(dataPresenca)
-        }
-    }, [])
+        const presencaId = localStorage.getItem("luna-storage-presencaId");
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => {
+        const getPresence = async () => {
+            console.log(`${process.env.NEXT_PUBLIC_URL_API}/presence/${presencaId}`)
+            const presenceResponse = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence/${presencaId}`)
+            const presenceData: PresencaDataResponse = await presenceResponse.json()
+            setPresenca({
+                nome: presenceData.name,
+                telefone: presenceData.phone,
+                acompanhantesAdultos: presenceData.acompanhantesAdultos,
+                acompanhantesCriancas: presenceData.acompanhantesCriancas,
+            });
+        }
+
+        if (presencaId) {
+            getPresence()
+        }
+    }, []);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const presentes = JSON.parse(localStorage.getItem("luna-storage-gifts") || "[]");
+
+        try {
+            const presenceResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_URL_API}/confirmPresence`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    method: "POST",
+                    body: JSON.stringify(formData),
+                }
+            );
+
+            if (!presenceResponse.ok) {
+                throw new Error("Erro ao confirmar presença. Tente novamente.");
+            }
+
+            const presenceData = await presenceResponse.json();
+            const presenceId = presenceData.id;
+
+            // Salva o ID de presença no localStorage
+            localStorage.setItem("luna-storage-presencaId", presenceId);
+
+            const presenceGifts = presentes.map((presentePresenteado: PresentePresenteado) => ({
+                presenceId,
+                giftId: presentePresenteado.presente.id,
+                quantity: presentePresenteado.quantidadePresenteado,
+            }));
+
+            const giftResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_URL_API}/presenceGift`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    method: "POST",
+                    body: JSON.stringify(presenceGifts),
+                }
+            );
+
+            if (!giftResponse.ok) {
+                throw new Error("Erro ao salvar os presentes. Tente novamente.");
+            }
+
+            toast("Presença e presentes registrados com sucesso!", toastSuccess);
+            abrirModal();
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error(error.message);
+                toast(error.message || "Ocorreu um erro. Tente novamente.", toastError);
+            } else {
+                console.error("Erro desconhecido", error);
+                toast("Ocorreu um erro inesperado. Tente novamente.", toastError);
+            }
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
 
         setFormData((prev) => ({
@@ -67,24 +161,6 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                 ? Number(value)
                 : value,
         }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        localStorage.setItem("luna-storage", JSON.stringify(formData))
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/confirmPresence`, {
-            headers: {
-                "Content-Type": 'application/json'
-            },
-            method: "POST",
-            body: JSON.stringify(formData),
-        })
-
-        console.log(response)
-
-        abrirModal()
     };
 
     const abrirModal = () => {
@@ -105,11 +181,9 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
 
     return (
         <div className="flex flex-col items-center justify-start min-h-screen px-4 gap-3">
-            <ToastContainer />
-            {/* Título */}
             <h1 className="text-3xl font-bold text-black text-center">
-                {!presenca ? "Confirme sua presença!" : "Presença confirmada!"}
-            </h1>
+                {!presenca ? "Confirme sua presença!" : "Presença confirmada!"}</h1>
+            <ToastContainer />
             <form
                 onSubmit={handleSubmit}
                 className="w-full max-w-xl space-y-6"
@@ -212,12 +286,12 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
 
                 {/* Presentes */}
                 {
-                    presentes && <div>
+                    presentesString && <div>
                         <label className="block mb-1 text-black font-bold">
                             Presentes
                         </label>
                         <label className="block mb-1 text-black">
-                            {presentes}
+                            {presentesString}
                         </label>
                     </div>
                 }

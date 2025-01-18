@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import Loading from "./Loading";
+import { toastError, toastSuccess } from "@/utils/toastOptions";
 
 interface Presente {
     id: string;
@@ -54,13 +55,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                 setPresentes(gifts);
             } catch (error) {
                 console.error("Erro ao recuperar presentes", error);
-                toast('Erro ao recuperar presentes',
-                    {
-                        theme: "colored",
-                        type: "error",
-                        autoClose: 10000,
-                        position: "bottom-center"
-                    })
+                toast('Erro ao recuperar presentes', toastError)
             } finally {
                 setLoading(false); // Finaliza o carregamento
             }
@@ -111,13 +106,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
         localStorage.setItem("luna-storage-gifts", JSON.stringify(newArrPresentes));
 
         if (presenca) {
-            toast("Presenteado!", {
-                theme: "colored",
-                type: "success",
-                style: { backgroundColor: "#725d4e" }, // Marronzim
-                autoClose: 10000,
-                position: "bottom-center",
-            });
+            toast("Presenteado!", toastSuccess);
         } else {
             acao("presenca-e");
         }
@@ -189,8 +178,13 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                             <p className="text-gray-600 text-sm">{presenteSelecionado.quantidade}</p>
                         </div>
 
+                        <div className="mb-2">
+                            <p className="font-bold text-gray-700">Quantidade já presenteado:</p>
+                            <p className="text-gray-600 text-sm">{presenteSelecionado.quantidadeComprado}</p>
+                        </div>
+
                         <div className="mb-4">
-                            <label className="block font-bold text-gray-700 mb-1 text-sm">Quantidade a presentear:</label>
+                            <p className="font-bold text-gray-700">Quantidade a presentear:</p>
                             <input
                                 type="number"
                                 value={quantidadePresentear}
