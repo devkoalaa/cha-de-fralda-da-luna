@@ -98,6 +98,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
 
             const result = localStorage.getItem("luna-storage-gifts");
             const presentesUsuario = result ? JSON.parse(result) : [];
+            localStorage.removeItem('luna-storage-gifts')
 
             let presenteExiste = false;
 
@@ -118,8 +119,6 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                     quantidadePresenteado: quantidadePresentear,
                 });
             }
-
-            localStorage.setItem("luna-storage-gifts", JSON.stringify(newArrPresentes));
 
             if (presenceId) {
                 const presenceGifts = newArrPresentes.map((presentePresenteado: PresentePresenteado) => ({
@@ -152,6 +151,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                     toast("Erro ao salvar os presentes. Tente novamente.", toastError);
                 }
             } else {
+                localStorage.setItem("luna-storage-gifts", JSON.stringify(newArrPresentes));
                 acao("presenca-e");
             }
 

@@ -62,11 +62,6 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
     useEffect(() => {
         if (tag === 'presenca-e') toast('Você deve confirmar presença!', toastError);
 
-        const giftsLocal = localStorage.getItem("luna-storage-gifts");
-        if (giftsLocal) {
-            setHasPresente(true);
-        }
-
         const presencaId = localStorage.getItem("luna-storage-presencaId");
 
         const getPresence = async () => {
@@ -75,6 +70,11 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
             const presenceResponse = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence/${presencaId}`)
             const presenceData: PresencaDataResponse = await presenceResponse.json()
             setPresenca(presenceData);
+
+            if (presenceData.selectedGifts.length > 0) {
+                setHasPresente(true);
+            }
+
             setLoadingGet(false)
         }
 
@@ -89,6 +89,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
         setModalVisible(true)
 
         const presentes = JSON.parse(localStorage.getItem("luna-storage-gifts") || "[]");
+        localStorage.removeItem('luna-storage-gifts')
 
         try {
             const presenceResponse = await fetch(
