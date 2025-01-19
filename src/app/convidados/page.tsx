@@ -1,38 +1,54 @@
 'use client'
 import { Convidado } from "@/interfaces/convidados";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Convidados() {
-  const [convidados, setConvidados] = useState([])
+  const [convidados, setConvidados] = useState<Convidado[]>([]);
+  const router = useRouter()
 
   useEffect(() => {
     try {
       const getConvidados = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence`)
-        const data = await response.json()
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence`);
+        const data = await response.json();
 
-        console.log(data)
-        setConvidados(data)
-      }
+        console.log(data);
+        setConvidados(data);
+      };
 
-      getConvidados()
+      getConvidados();
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }, [])
+  }, []);
+
+  const totalConvidados = convidados.length;
+  const totalAcompanhantesAdultos = convidados.reduce(
+    (total, convidado) => total + convidado.acompanhantesAdultos,
+    0
+  );
+  const totalAcompanhantesCriancas = convidados.reduce(
+    (total, convidado) => total + convidado.acompanhantesCriancas,
+    0
+  );
+  const totalPresentes = convidados.reduce(
+    (total, convidado) => total + convidado.selectedGifts.reduce((sum, gift) => sum + gift.quantity, 0),
+    0
+  );
 
   return (
-    <div className="flex items-center justify-center min-h-screen lg:bg-cover lg:bg-center bg-red-600" style={{ backgroundImage: 'url(/images/background.png)' }}>
+    <div className="flex items-center justify-center min-h-screen lg:bg-cover lg:bg-center" style={{ backgroundImage: 'url(/images/background.png)' }}>
       <div className="flex flex-col items-center justify-between font-[family-name:var(--font-geist-sans)] rounded-xl w-full m-0.8">
-        <div className="top-0 left-0 w-full flex flex-col items-center px-9">
+        <div className="top-0 left-0 w-full flex flex-col items-center px-9" onClick={() => router.replace('/')}>
           <Image
             src="/images/lunaLogo.png"
             alt="Luna logo"
             width={200}
             height={200}
             priority
-            className="mb-3 md:mb-6"
+            className="mb-3 md:mb-6 cursor-pointer"
           />
         </div>
 
@@ -49,7 +65,7 @@ export default function Convidados() {
                 </tr>
               </thead>
               <tbody>
-                {convidados.map((convidado: Convidado, index) => (
+                {convidados.map((convidado, index) => (
                   <tr key={index} className="hover:bg-gray-50 border-marronzim border-2">
                     <td className="px-4 py-2 border-b font-bold text-sm md:text-base">{convidado.name}</td>
                     <td className="px-4 py-2 border-b text-sm md:text-base">{convidado.phone}</td>
@@ -72,6 +88,17 @@ export default function Convidados() {
                   </tr>
                 ))}
               </tbody>
+              <tfoot>
+                <tr className="bg-gray-200 border-marronzim border-x-2 border-b-2">
+                  <td className="px-4 py-2 font-bold text-sm md:text-base border-t-2 border-marronzim">Total</td>
+                  <td className="px-4 py-2 text-sm md:text-base border-t-2 border-marronzim">{totalConvidados} Convidados</td>
+                  <td className="px-4 py-2 text-sm md:text-base border-t-2 border-marronzim"></td>
+                  <td className="px-4 py-2 text-sm md:text-base border-t-2 border-marronzim">
+                    {totalAcompanhantesAdultos} Adultos, {totalAcompanhantesCriancas} Crianças
+                  </td>
+                  <td className="px-4 py-2 text-sm md:text-base border-t-2 border-marronzim">{totalPresentes} Presentes</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         }

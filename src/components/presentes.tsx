@@ -167,7 +167,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
             <h1 className="text-3xl font-bold text-black text-center">Lista de Presentes</h1>
             <ToastContainer />
             {loading ? (
-                <Loading />
+                <Loading xl alternativeColor />
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
                     {presentes.map((presente, i) => (

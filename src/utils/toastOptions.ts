@@ -2,9 +2,10 @@ import { ToastOptions } from "react-toastify";
 
 const defaultToast: ToastOptions = {
     theme: "colored",
-    autoClose: 10000,
+    autoClose: 5000,
     pauseOnFocusLoss: false,
     position: "bottom-center",
+    pauseOnHover: false
 };
 
 export const toastError: ToastOptions = {

@@ -89,6 +89,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
         setModalVisible(true)
 
         const presentes = JSON.parse(localStorage.getItem("luna-storage-gifts") || "[]");
+        if (presentes.length > 0) setHasPresente(true)
         localStorage.removeItem('luna-storage-gifts')
 
         try {
@@ -181,7 +182,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                 {!presenca ? "Confirme sua presença!" : "Presença confirmada!"}</h1>
             <ToastContainer />
             {loadingGet
-                ? <Loading />
+                ? <Loading xl alternativeColor />
                 : <form
                     onSubmit={handleSubmit}
                     className="w-full max-w-xl space-y-6"
