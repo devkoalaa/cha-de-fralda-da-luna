@@ -1,8 +1,8 @@
+import { toastError, toastSuccess } from "@/utils/toastOptions";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import Loading from "./Loading";
-import { toastError, toastSuccess } from "@/utils/toastOptions";
 
 interface Presente {
     id: string;
@@ -23,46 +23,58 @@ interface GiftResponse {
     image: string;
 }
 
+interface PresentePresenteado {
+    presente: {
+        id: string;
+        nome: string;
+        descricao: string;
+        imagem: string;
+        quantidade: number;
+        quantidadeComprado: number;
+    },
+    quantidadePresenteado: number
+}
+
 export default function Presentes({ acao }: { acao: (tela: string) => void }) {
     const [modalVisible, setModalVisible] = useState(false);
     const [presenteSelecionado, setPresenteSelecionado] = useState<Presente | null>(null);
     const [quantidadePresentear, setQuantidadePresentear] = useState(1);
     const [presentes, setPresentes] = useState<Presente[]>([]);
-    const [presenca, setPresenca] = useState();
+    const [presenceId, setPresencaId] = useState("");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const result = localStorage.getItem("luna-storage");
+        const result = localStorage.getItem("luna-storage-presencaId");
 
         if (result) {
-            setPresenca(JSON.parse(result));
+            setPresencaId(result);
         }
-
-        const getGifts = async () => {
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/gifts`);
-                const data = await response.json();
-
-                const gifts: Presente[] = data.map((presente: GiftResponse) => ({
-                    id: presente.id,
-                    nome: presente.name,
-                    descricao: presente.description,
-                    quantidade: presente.quantity,
-                    quantidadeComprado: presente.quantityPurchased,
-                    imagem: presente.image,
-                }));
-
-                setPresentes(gifts);
-            } catch (error) {
-                console.error("Erro ao recuperar presentes", error);
-                toast('Erro ao recuperar presentes', toastError)
-            } finally {
-                setLoading(false); // Finaliza o carregamento
-            }
-        };
 
         getGifts();
     }, []);
+
+    const getGifts = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/gifts`);
+            const data = await response.json();
+
+            const gifts: Presente[] = data.map((presente: GiftResponse) => ({
+                id: presente.id,
+                nome: presente.name,
+                descricao: presente.description,
+                quantidade: presente.quantity,
+                quantidadeComprado: presente.quantityPurchased,
+                imagem: presente.image,
+            }));
+
+            setPresentes(gifts);
+        } catch (error) {
+            console.error("Erro ao recuperar presentes", error);
+            toast('Erro ao recuperar presentes', toastError)
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const abrirModal = (presente: Presente) => {
         setPresenteSelecionado(presente);
@@ -77,7 +89,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
         document.body.style.overflow = "auto";
     };
 
-    const confirmarPresentear = () => {
+    const confirmarPresentear = async () => {
         if (!presenteSelecionado) return;
 
         const result = localStorage.getItem("luna-storage-gifts");
@@ -85,12 +97,12 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
 
         let presenteExiste = false;
 
-        const newArrPresentes = presentesUsuario.map((presentePresenteado: { presente: Presente; quantidadePresenteado: number }) => {
+        const newArrPresentes = presentesUsuario.map((presentePresenteado: PresentePresenteado) => {
             if (presentePresenteado.presente.id === presenteSelecionado.id) {
                 presenteExiste = true;
                 return {
                     ...presentePresenteado,
-                    quantidadePresenteado: presentePresenteado.quantidadePresenteado + quantidadePresentear,
+                    quantidadePresenteado: quantidadePresentear,
                 };
             }
             return presentePresenteado;
@@ -105,8 +117,30 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
 
         localStorage.setItem("luna-storage-gifts", JSON.stringify(newArrPresentes));
 
-        if (presenca) {
+        if (presenceId) {
+            const presenceGifts = newArrPresentes.map((presentePresenteado: PresentePresenteado) => ({
+                presenceId,
+                giftId: presentePresenteado.presente.id,
+                quantity: presentePresenteado.quantidadePresenteado,
+            }));
+
+            const giftResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_URL_API}/presenceGift`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    method: "POST",
+                    body: JSON.stringify(presenceGifts),
+                }
+            );
+
+            if (!giftResponse.ok) {
+                throw new Error("Erro ao salvar os presentes. Tente novamente.");
+            }
+
             toast("Presenteado!", toastSuccess);
+            getGifts();
         } else {
             acao("presenca-e");
         }
@@ -124,8 +158,9 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
                     {presentes.map((presente, i) => (
                         <div
+                            onClick={() => abrirModal(presente)}
                             key={i}
-                            className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 hover:scale-105"
+                            className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 sm:hover:scale-105"
                         >
                             <Image
                                 src={presente.imagem}
@@ -134,12 +169,11 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                                 height={200}
                                 className="rounded-md"
                             />
-                            <h3 className="mt-4 text-lg text-black font-bold">{presente.nome}</h3>
-                            <p className="text-black mb-4">{presente.descricao.length < 100 ? presente.descricao : `${presente.descricao.substring(0, 30)}...`}</p>
-                            <p className="text-black mb-4">Quantidade: {presente.quantidade}</p>
-                            <button
-                                onClick={() => abrirModal(presente)}
-                                className="bg-marronzim text-white py-2 px-4 rounded-md hover:bg-marronzim-escuro transition-colors duration-200"
+                            <h3 className="my-4 text-lg text-black font-bold">{presente.nome}</h3>
+                            <p className="text-black mb-2">{presente.descricao.length < 100 ? presente.descricao : `${presente.descricao.substring(0, 30)}...`}</p>
+                            <p className="text-black mb-2">Quantidade desejada: {presente.quantidade}</p>
+                            <p className="text-black mb-4">Quantidade presenteada: {presente.quantidadeComprado}</p>
+                            <button className="bg-marronzim text-white py-2 px-4 rounded-md hover:bg-marronzim-escuro transition-colors duration-200"
                             >
                                 Presentear
                             </button>
@@ -174,7 +208,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                         </div>
 
                         <div className="mb-2">
-                            <p className="font-bold text-gray-700">Quantidade disponível:</p>
+                            <p className="font-bold text-gray-700">Quantidade desejada:</p>
                             <p className="text-gray-600 text-sm">{presenteSelecionado.quantidade}</p>
                         </div>
 

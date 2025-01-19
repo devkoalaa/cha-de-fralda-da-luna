@@ -3,6 +3,7 @@ import { toastError, toastSuccess } from "@/utils/toastOptions";
 import { InputMask } from '@react-input/mask';
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
+import Loading from "./Loading";
 
 interface PresencaData {
     nome: string;
@@ -43,6 +44,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
     const [presenca, setPresenca] = useState<PresencaData | null>(null)
     const [presentesString, setPresentesString] = useState(null)
     const [modalVisible, setModalVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState<PresencaData>({
         nome: "",
         telefone: "",
@@ -75,7 +77,8 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
         const presencaId = localStorage.getItem("luna-storage-presencaId");
 
         const getPresence = async () => {
-            console.log(`${process.env.NEXT_PUBLIC_URL_API}/presence/${presencaId}`)
+            setLoading(true)
+
             const presenceResponse = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence/${presencaId}`)
             const presenceData: PresencaDataResponse = await presenceResponse.json()
             setPresenca({
@@ -84,6 +87,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                 acompanhantesAdultos: presenceData.acompanhantesAdultos,
                 acompanhantesCriancas: presenceData.acompanhantesCriancas,
             });
+            setLoading(false)
         }
 
         if (presencaId) {
@@ -139,7 +143,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                 throw new Error("Erro ao salvar os presentes. Tente novamente.");
             }
 
-            toast("Presença e presentes registrados com sucesso!", toastSuccess);
+            toast(presentesString ? "Presença e presentes registrados com sucesso!" : "Presença registrada com sucesso!", toastSuccess);
             abrirModal();
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -180,149 +184,150 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
     };
 
     return (
-        <div className="flex flex-col items-center justify-start min-h-screen px-4 gap-3">
+        <div className="flex flex-col items-center justify-start px-4 gap-3">
             <h1 className="text-3xl font-bold text-black text-center">
                 {!presenca ? "Confirme sua presença!" : "Presença confirmada!"}</h1>
             <ToastContainer />
-            <form
-                onSubmit={handleSubmit}
-                className="w-full max-w-xl space-y-6"
-            >
-                {/* Campo Nome */}
-                <div>
-                    <label className="block mb-1 text-black font-bold">
-                        Nome
-                    </label>
-                    {presenca
-                        ?
-                        <label className="block mb-1 text-black">
-                            {presenca.nome ?? "Sem nome"}
+            {loading
+                ? <Loading />
+                : <form
+                    onSubmit={handleSubmit}
+                    className="w-full max-w-xl space-y-6"
+                >
+                    {/* Campo Nome */}
+                    <div>
+                        <label className="block mb-1 text-black font-bold">
+                            Nome
                         </label>
-                        : <input
-                            type="text"
-                            name="nome"
-                            placeholder="Seu nome!"
-                            value={formData.nome}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 border rounded-md text-black"
-                        />}
-                </div>
-
-                {/* Campo Telefone */}
-                <div>
-                    <label className="block mb-1 text-black font-bold">
-                        Telefone
-                    </label>
-                    {
-                        presenca
+                        {presenca
                             ?
                             <label className="block mb-1 text-black">
-                                {presenca.telefone ?? "Sem telefone"}
+                                {presenca.nome ?? "Sem nome"}
                             </label>
-                            :
-                            <InputMask
-                                name="telefone"
-                                className="w-full px-3 py-2 border rounded-md text-black"
-                                mask="(__) _____-____"
+                            : <input
+                                type="text"
+                                name="nome"
+                                placeholder="Seu nome!"
+                                value={formData.nome}
                                 onChange={handleChange}
-                                replacement={{ _: /\d/ }}
-                                placeholder="(99) 99999-9999"
                                 required
-                                value={formData.telefone}
-                            />
-                    }
-                </div>
-
-                {/* Campo Acompanhantes */}
-                <div>
-                    <label className="block mb-1 text-black font-bold">
-                        Nº de acompanhantes (sem contar você)
-                    </label>
-                    <div className="flex space-x-4">
-                        <div className="w-1/2">
-                            <label className="block mb-1 text-black font-bold">
-                                Adultos
-                            </label>
-                            {presenca
-                                ? <label className="block mb-1 text-black font-medium">
-                                    {presenca.acompanhantesAdultos}
-                                </label>
-                                : <InputMask
-                                    name="acompanhantesAdultos"
-                                    className="w-full px-3 py-2 border rounded-md text-black text-medium"
-                                    mask="__"
-                                    onChange={handleChange}
-                                    replacement={{ _: /\d/ }}
-                                    placeholder="Adultos"
-                                    required
-                                    min={0}
-                                    max={10}
-                                />}
-                        </div>
-                        <div className="w-1/2">
-                            <label className="block mb-1 text-black font-bold">
-                                Crianças
-                            </label>
-                            {presenca
-                                ? <label className="block mb-1 text-black font-medium">
-                                    {presenca.acompanhantesCriancas}
-                                </label>
-                                : <InputMask
-                                    name="acompanhantesCriancas"
-                                    className="w-full px-3 py-2 border rounded-md text-black text-medium"
-                                    mask="__"
-                                    onChange={handleChange}
-                                    replacement={{ _: /\d/ }}
-                                    placeholder="Crianças"
-                                    required
-                                    min={0}
-                                    max={10}
-                                />}
-                        </div>
+                                className="w-full px-3 py-2 border rounded-md text-black"
+                            />}
                     </div>
 
-                </div>
-
-                {/* Presentes */}
-                {
-                    presentesString && <div>
+                    {/* Campo Telefone */}
+                    <div>
                         <label className="block mb-1 text-black font-bold">
-                            Presentes
+                            Telefone
                         </label>
-                        <label className="block mb-1 text-black">
-                            {presentesString}
-                        </label>
+                        {
+                            presenca
+                                ?
+                                <label className="block mb-1 text-black">
+                                    {presenca.telefone ?? "Sem telefone"}
+                                </label>
+                                :
+                                <InputMask
+                                    name="telefone"
+                                    className="w-full px-3 py-2 border rounded-md text-black"
+                                    mask="(__) _____-____"
+                                    onChange={handleChange}
+                                    replacement={{ _: /\d/ }}
+                                    placeholder="(99) 99999-9999"
+                                    required
+                                    value={formData.telefone}
+                                />
+                        }
                     </div>
-                }
 
-                {/* Botão de Enviar */}
-                {
-                    presenca
-                        ? <button onClick={() => acao('presentes')}
-                            className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
+                    {/* Campo Acompanhantes */}
+                    <div>
+                        <label className="block mb-1 text-black font-bold">
+                            Nº de acompanhantes (sem contar você)
+                        </label>
+                        <div className="flex space-x-4">
+                            <div className="w-1/2">
+                                <label className="block mb-1 text-black font-bold">
+                                    Adultos
+                                </label>
+                                {presenca
+                                    ? <label className="block mb-1 text-black font-medium">
+                                        {presenca.acompanhantesAdultos}
+                                    </label>
+                                    : <InputMask
+                                        name="acompanhantesAdultos"
+                                        className="w-full px-3 py-2 border rounded-md text-black text-medium"
+                                        mask="__"
+                                        onChange={handleChange}
+                                        replacement={{ _: /\d/ }}
+                                        placeholder="Adultos"
+                                        required
+                                        min={0}
+                                        max={10}
+                                    />}
+                            </div>
+                            <div className="w-1/2">
+                                <label className="block mb-1 text-black font-bold">
+                                    Crianças
+                                </label>
+                                {presenca
+                                    ? <label className="block mb-1 text-black font-medium">
+                                        {presenca.acompanhantesCriancas}
+                                    </label>
+                                    : <InputMask
+                                        name="acompanhantesCriancas"
+                                        className="w-full px-3 py-2 border rounded-md text-black text-medium"
+                                        mask="__"
+                                        onChange={handleChange}
+                                        replacement={{ _: /\d/ }}
+                                        placeholder="Crianças"
+                                        required
+                                        min={0}
+                                        max={10}
+                                    />}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Presentes */}
+                    {
+                        presentesString && <div>
+                            <label className="block mb-1 text-black font-bold">
+                                Presentes
+                            </label>
+                            <label className="block mb-1 text-black">
+                                {presentesString}
+                            </label>
+                        </div>
+                    }
+
+                    {/* Botão de Enviar */}
+                    {
+                        presenca
+                            ? <button onClick={() => acao('presentes')}
+                                className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
+                            >
+                                Presentear
+                            </button>
+                            : <button
+                                type="submit"
+                                className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
+                            >
+                                Confirmar
+                            </button>
+                    }
+                    {
+                        presenca &&
+                        <button type="button" onClick={() => {
+                            localStorage.removeItem('luna-storage-presencaId')
+                            location.reload()
+                        }}
+                            className="w-full px-4 py-2 border rounded-md bg-red-700 text-white font-medium"
                         >
-                            Presentear
+                            Limpar
                         </button>
-                        : <button
-                            type="submit"
-                            className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
-                        >
-                            Confirmar
-                        </button>
-                }
-                {
-                    presenca &&
-                    <button type="button" onClick={() => {
-                        localStorage.removeItem('luna-storage')
-                        location.reload()
-                    }}
-                        className="w-full px-4 py-2 border rounded-md bg-red-700 text-white font-medium"
-                    >
-                        Limpar
-                    </button>
-                }
-            </form >
+                    }
+                </form >}
 
             {
                 modalVisible && (
@@ -334,22 +339,30 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                     Obrigado por confirmar presença! Mal posso esperar para compartilhar este momento especial com você!
                                 </p>
                             </div>
-                            <div className="text-center mb-4">
+                            {!presentesString && <div className="text-center mb-4">
                                 <p className="font-medium text-gray-700">Que tal aproveitar para nos presentear!</p>
-                            </div>
+                            </div>}
                             <div className="flex justify-center gap-4">
-                                <button
+                                {!presentesString ? <><button
                                     onClick={() => fecharModal(false)}
                                     className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
                                 >
                                     Cancelar
                                 </button>
-                                <button
-                                    onClick={() => fecharModal(true)}
-                                    className="bg-verde text-white py-2 px-4 rounded-md hover:bg-verde-escuro-90 transition"
-                                >
-                                    Presentear
-                                </button>
+                                    <button
+                                        onClick={() => fecharModal(true)}
+                                        className="bg-verde text-white py-2 px-4 rounded-md hover:bg-verde-escuro-90 transition"
+                                    >
+                                        Presentear
+                                    </button></> : <button
+                                        onClick={() => {
+                                            fecharModal(false)
+                                            acao('presenca')
+                                        }}
+                                        className="bg-verde text-white py-2 px-9 rounded-md hover:bg-verde-escuro-90 transition"
+                                    >
+                                    Ok
+                                </button>}
                             </div>
                         </div>
                     </div>
