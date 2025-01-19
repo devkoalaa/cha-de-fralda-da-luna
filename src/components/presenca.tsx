@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { toastError, toastSuccess } from "@/utils/toastOptions";
 import { InputMask } from '@react-input/mask';
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import Loading from "./Loading";
@@ -20,10 +21,15 @@ interface PresencaDataResponse {
     acompanhantesCriancas: number,
     selectedGifts: [
         {
-            id: string,
-            presenceId: string,
-            giftId: string,
-            quantity: 1
+            gift: {
+                id: string,
+                name: string,
+                image: string,
+                description: string,
+                quantity: number,
+                quantityPurchased: number,
+            },
+            quantity: number,
         }
     ]
 }
@@ -41,10 +47,11 @@ interface PresentePresenteado {
 }
 
 export default function Presenca({ acao, tag }: { acao: (tela: string) => void, tag: string }) {
-    const [presenca, setPresenca] = useState<PresencaData | null>(null)
-    const [presentesString, setPresentesString] = useState(null)
+    const [presenca, setPresenca] = useState<PresencaDataResponse | null>(null)
+    const [hasPresente, setHasPresente] = useState(false)
     const [modalVisible, setModalVisible] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [loadingGet, setLoadingGet] = useState(false);
+    const [loadingPost, setLoadingPost] = useState(false);
     const [formData, setFormData] = useState<PresencaData>({
         nome: "",
         telefone: "",
@@ -57,37 +64,18 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
 
         const giftsLocal = localStorage.getItem("luna-storage-gifts");
         if (giftsLocal) {
-            const dataGifts = JSON.parse(giftsLocal);
-            setPresentesString(() => {
-                const textoPresentes = dataGifts
-                    .map((presentePresenteado: PresentePresenteado) => {
-                        const { nome } = presentePresenteado.presente;
-                        const { quantidadePresenteado } = presentePresenteado;
-
-                        const unidadeTexto = quantidadePresenteado === 1 ? 'unidade' : 'unidades';
-
-                        return `${nome} (${quantidadePresenteado} ${unidadeTexto})`;
-                    })
-                    .join(', ');
-
-                return textoPresentes;
-            });
+            setHasPresente(true);
         }
 
         const presencaId = localStorage.getItem("luna-storage-presencaId");
 
         const getPresence = async () => {
-            setLoading(true)
+            setLoadingGet(true)
 
             const presenceResponse = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence/${presencaId}`)
             const presenceData: PresencaDataResponse = await presenceResponse.json()
-            setPresenca({
-                nome: presenceData.name,
-                telefone: presenceData.phone,
-                acompanhantesAdultos: presenceData.acompanhantesAdultos,
-                acompanhantesCriancas: presenceData.acompanhantesCriancas,
-            });
-            setLoading(false)
+            setPresenca(presenceData);
+            setLoadingGet(false)
         }
 
         if (presencaId) {
@@ -97,6 +85,8 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setLoadingPost(true)
+        setModalVisible(true)
 
         const presentes = JSON.parse(localStorage.getItem("luna-storage-gifts") || "[]");
 
@@ -118,8 +108,6 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
 
             const presenceData = await presenceResponse.json();
             const presenceId = presenceData.id;
-
-            // Salva o ID de presença no localStorage
             localStorage.setItem("luna-storage-presencaId", presenceId);
 
             const presenceGifts = presentes.map((presentePresenteado: PresentePresenteado) => ({
@@ -143,7 +131,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                 throw new Error("Erro ao salvar os presentes. Tente novamente.");
             }
 
-            toast(presentesString ? "Presença e presentes registrados com sucesso!" : "Presença registrada com sucesso!", toastSuccess);
+            toast(hasPresente ? "Presença e presentes registrados com sucesso!" : "Presença registrada com sucesso!", toastSuccess);
             abrirModal();
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -153,6 +141,8 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                 console.error("Erro desconhecido", error);
                 toast("Ocorreu um erro inesperado. Tente novamente.", toastError);
             }
+        } finally {
+            setLoadingPost(false)
         }
     };
 
@@ -179,6 +169,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
         if (encaminhar) {
             acao('presentes')
         } else {
+            acao('presenca')
             location.reload()
         }
     };
@@ -188,7 +179,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
             <h1 className="text-3xl font-bold text-black text-center">
                 {!presenca ? "Confirme sua presença!" : "Presença confirmada!"}</h1>
             <ToastContainer />
-            {loading
+            {loadingGet
                 ? <Loading />
                 : <form
                     onSubmit={handleSubmit}
@@ -202,7 +193,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                         {presenca
                             ?
                             <label className="block mb-1 text-black">
-                                {presenca.nome ?? "Sem nome"}
+                                {presenca.name ?? "Sem nome"}
                             </label>
                             : <input
                                 type="text"
@@ -224,7 +215,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                             presenca
                                 ?
                                 <label className="block mb-1 text-black">
-                                    {presenca.telefone ?? "Sem telefone"}
+                                    {presenca.phone ?? "Sem telefone"}
                                 </label>
                                 :
                                 <InputMask
@@ -290,15 +281,39 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                     </div>
 
                     {/* Presentes */}
-                    {
-                        presentesString && <div>
+                    {hasPresente &&
+                        <>
                             <label className="block mb-1 text-black font-bold">
-                                Presentes
+                                Seus presentes
                             </label>
-                            <label className="block mb-1 text-black">
-                                {presentesString}
-                            </label>
-                        </div>
+                            <div
+                                className={`grid gap-8 w-full ${presenca?.selectedGifts.length === 1
+                                    ? "grid-cols-1 justify-center"
+                                    : "sm:grid-cols-2 lg:grid-cols-3"
+                                    }`}
+                            >
+                                {presenca?.selectedGifts.map((presente, i) => (
+                                    <div key={i} className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 sm:hover:scale-105">
+                                        <Image
+                                            src={presente.gift.image}
+                                            alt={`Presente ${i + 1}`}
+                                            width={200}
+                                            height={200}
+                                            className="rounded-md"
+                                        />
+                                        <h3 className="my-4 text-lg text-black font-bold">{presente.gift.name}</h3>
+                                        <p className="text-black mb-2 text-center">
+                                            {presente.gift.description.length < 30
+                                                ? presente.gift.description
+                                                : `${presente.gift.description.substring(0, 30)}...`}
+                                        </p>
+                                        <p className="text-black mb-2 text-center">
+                                            Quantidade reservada por você: {presente.quantity}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
                     }
 
                     {/* Botão de Enviar */}
@@ -329,38 +344,56 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
             {
                 modalVisible && (
                     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-                        <div className="bg-white p-8 rounded-lg shadow-lg lg:w-1/3 md:w-1/2 w-11/12">
-                            <h2 className="text-2xl font-bold text-center mb-4">Sua presença foi confirmada com sucesso!</h2>
-                            <div className="text-center mb-4">
-                                <p className="font-medium text-gray-700">
-                                    Obrigado por confirmar presença! Mal posso esperar para compartilhar este momento especial com você!
-                                </p>
-                            </div>
-                            {!presentesString && <div className="text-center mb-4">
-                                <p className="font-medium text-gray-700">Que tal aproveitar para nos presentear!</p>
-                            </div>}
-                            <div className="flex justify-center gap-4">
-                                {!presentesString ? <><button
-                                    onClick={() => fecharModal(false)}
-                                    className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
-                                >
-                                    Cancelar
-                                </button>
-                                    <button
-                                        onClick={() => fecharModal(true)}
-                                        className="bg-verde text-white py-2 px-4 rounded-md hover:bg-verde-escuro-90 transition"
-                                    >
-                                        Presentear
-                                    </button></> : <button
-                                        onClick={() => {
-                                            fecharModal(false)
-                                            acao('presenca')
-                                        }}
-                                        className="bg-verde text-white py-2 px-9 rounded-md hover:bg-verde-escuro-90 transition"
-                                    >
-                                    Ok
-                                </button>}
-                            </div>
+                        <div className={`bg-white p-8 rounded-lg shadow-lg min-h-[200px] lg:w-1/3 md:w-1/2 w-11/12 ${loadingPost ? "flex items-center justify-center" : ""}`}>
+                            {loadingPost ? (
+                                <div className="flex items-center justify-center w-full h-full">
+                                    <Loading />
+                                </div>
+                            ) : (
+                                <>
+                                    <h2 className="text-2xl font-bold text-center mb-4">
+                                        Sua presença foi confirmada com sucesso!
+                                    </h2>
+                                    <div className="text-center mb-4">
+                                        <p className="font-medium text-gray-700">
+                                            Obrigado por confirmar presença! Mal posso esperar para compartilhar este momento especial com você!
+                                        </p>
+                                    </div>
+                                    {!hasPresente && (
+                                        <div className="text-center mb-4">
+                                            <p className="font-medium text-gray-700">Que tal aproveitar para nos presentear!</p>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-center gap-4">
+                                        {!hasPresente ? (
+                                            <>
+                                                <button
+                                                    onClick={() => fecharModal(false)}
+                                                    className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        acao('presenca');
+                                                        fecharModal(true);
+                                                    }}
+                                                    className="bg-verde text-white py-2 px-4 rounded-md hover:bg-verde-escuro-90 transition"
+                                                >
+                                                    Presentear
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <button
+                                                onClick={() => fecharModal(false)}
+                                                className="bg-verde text-white py-2 px-9 rounded-md hover:bg-verde-escuro-90 transition"
+                                            >
+                                                Ok
+                                            </button>
+                                        )}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 )

@@ -90,62 +90,76 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
     };
 
     const confirmarPresentear = async () => {
-        if (!presenteSelecionado) return;
-
-        const result = localStorage.getItem("luna-storage-gifts");
-        const presentesUsuario = result ? JSON.parse(result) : [];
-
-        let presenteExiste = false;
-
-        const newArrPresentes = presentesUsuario.map((presentePresenteado: PresentePresenteado) => {
-            if (presentePresenteado.presente.id === presenteSelecionado.id) {
-                presenteExiste = true;
-                return {
-                    ...presentePresenteado,
-                    quantidadePresenteado: quantidadePresentear,
-                };
+        try {
+            if (!presenteSelecionado) {
+                toast("Nenhum presente selecionado.", toastError);
+                return;
             }
-            return presentePresenteado;
-        });
 
-        if (!presenteExiste) {
-            newArrPresentes.push({
-                presente: presenteSelecionado,
-                quantidadePresenteado: quantidadePresentear,
-            });
-        }
+            const result = localStorage.getItem("luna-storage-gifts");
+            const presentesUsuario = result ? JSON.parse(result) : [];
 
-        localStorage.setItem("luna-storage-gifts", JSON.stringify(newArrPresentes));
+            let presenteExiste = false;
 
-        if (presenceId) {
-            const presenceGifts = newArrPresentes.map((presentePresenteado: PresentePresenteado) => ({
-                presenceId,
-                giftId: presentePresenteado.presente.id,
-                quantity: presentePresenteado.quantidadePresenteado,
-            }));
-
-            const giftResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_URL_API}/presenceGift`,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    method: "POST",
-                    body: JSON.stringify(presenceGifts),
+            const newArrPresentes = presentesUsuario.map((presentePresenteado: PresentePresenteado) => {
+                if (presentePresenteado.presente.id === presenteSelecionado.id) {
+                    presenteExiste = true;
+                    return {
+                        ...presentePresenteado,
+                        quantidadePresenteado: quantidadePresentear,
+                    };
                 }
-            );
+                return presentePresenteado;
+            });
 
-            if (!giftResponse.ok) {
-                throw new Error("Erro ao salvar os presentes. Tente novamente.");
+            if (!presenteExiste) {
+                newArrPresentes.push({
+                    presente: presenteSelecionado,
+                    quantidadePresenteado: quantidadePresentear,
+                });
             }
 
-            toast("Presenteado!", toastSuccess);
-            getGifts();
-        } else {
-            acao("presenca-e");
-        }
+            localStorage.setItem("luna-storage-gifts", JSON.stringify(newArrPresentes));
 
-        fecharModal();
+            if (presenceId) {
+                const presenceGifts = newArrPresentes.map((presentePresenteado: PresentePresenteado) => ({
+                    presenceId,
+                    giftId: presentePresenteado.presente.id,
+                    quantity: presentePresenteado.quantidadePresenteado,
+                }));
+
+                try {
+                    const giftResponse = await fetch(
+                        `${process.env.NEXT_PUBLIC_URL_API}/presenceGift`,
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            method: "POST",
+                            body: JSON.stringify(presenceGifts),
+                        }
+                    );
+
+                    if (!giftResponse.ok) {
+                        const errorData = await giftResponse.json();
+                        throw new Error(errorData.message || "Erro ao salvar os presentes.");
+                    }
+
+                    toast("Presenteado!", toastSuccess);
+                    getGifts();
+                } catch (fetchError) {
+                    console.error("Erro ao salvar presentes na API:", fetchError);
+                    toast("Erro ao salvar os presentes. Tente novamente.", toastError);
+                }
+            } else {
+                acao("presenca-e");
+            }
+
+            fecharModal();
+        } catch (error) {
+            console.error("Erro ao confirmar presentear:", error);
+            toast("Ocorreu um erro inesperado. Tente novamente.", toastError);
+        }
     };
 
     return (
@@ -224,7 +238,6 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                                 value={quantidadePresentear}
                                 onChange={(e) => setQuantidadePresentear(Number(e.target.value))}
                                 min="1"
-                                max={presenteSelecionado.quantidade}
                                 className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-verde focus:border-verde"
                             />
                         </div>

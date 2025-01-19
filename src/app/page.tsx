@@ -39,7 +39,7 @@ export default function Home() {
             width={300}
             height={300}
             priority
-            className="mb-3"
+            className="mb-3 md:mb-6"
           />
 
           {/* Menu para telas grandes */}
