@@ -65,21 +65,37 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
         const presencaId = localStorage.getItem("luna-storage-presencaId");
 
         const getPresence = async () => {
-            setLoadingGet(true)
+            setLoadingGet(true);
 
-            const presenceResponse = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence/${presencaId}`)
-            const presenceData: PresencaDataResponse = await presenceResponse.json()
-            setPresenca(presenceData);
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence/${presencaId}`);
 
-            if (presenceData.selectedGifts.length > 0) {
-                setHasPresente(true);
+                if (response.status === 404) {
+                    localStorage.removeItem("luna-storage-presencaId");
+                    setLoadingGet(false);
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar os dados.');
+                }
+
+                const presenceData: PresencaDataResponse = await response.json();
+                setPresenca(presenceData);
+
+                if (presenceData.selectedGifts.length > 0) {
+                    setHasPresente(true);
+                }
+            } catch (error) {
+                console.error(error);
+                toast('Erro ao buscar os dados. Tente novamente mais tarde.', toastError);
+            } finally {
+                setLoadingGet(false);
             }
-
-            setLoadingGet(false)
-        }
+        };
 
         if (presencaId) {
-            getPresence()
+            getPresence();
         }
     }, []);
 
@@ -291,26 +307,31 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                             <div
                                 className={`grid gap-8 w-full ${presenca?.selectedGifts.length === 1
                                     ? "grid-cols-1 justify-center"
-                                    : "sm:grid-cols-2 lg:grid-cols-3"
+                                    : "sm:grid-cols-2 lg:grid-cols-2"
                                     }`}
                             >
                                 {presenca?.selectedGifts.map((presente, i) => (
-                                    <div key={i} className="flex flex-col items-center p-4 bg-white shadow-md rounded-md">
-                                        <Image
-                                            src={presente.gift.image}
-                                            alt={`Presente ${i + 1}`}
-                                            width={200}
-                                            height={200}
-                                            className="rounded-md"
-                                        />
-                                        <h3 className="my-4 text-lg text-black font-bold">{presente.gift.name}</h3>
-                                        <p className="text-black mb-2 text-center">
+                                    <div
+                                        key={i}
+                                        className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 sm:hover:scale-105"
+                                    >
+                                        <div className="w-48 h-48 overflow-hidden flex items-center justify-center rounded-md">
+                                            <Image
+                                                src={presente.gift.image}
+                                                alt={`Presente ${i + 1}`}
+                                                width={200}
+                                                height={200}
+                                                className="object-contain w-full h-full"
+                                            />
+                                        </div>
+                                        <h3 className="my-4 text-lg text-center text-black font-bold">{presente.gift.name}</h3>
+                                        <p className="text-black mb-2 text-sm text-center">
                                             {presente.gift.description.length < 30
                                                 ? presente.gift.description
                                                 : `${presente.gift.description.substring(0, 30)}...`}
                                         </p>
-                                        <p className="text-black mb-2 text-center">
-                                            Quantidade reservada por você: {presente.quantity}
+                                        <p className="text-black mb-2 text-sm text-center">
+                                            Quantidade reservada por você: <span className="font-bold">{presente.quantity}</span>
                                         </p>
                                     </div>
                                 ))}

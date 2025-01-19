@@ -176,62 +176,68 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                             key={i}
                             className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 cursor-pointer sm:hover:scale-105"
                         >
-                            <Image
-                                src={presente.imagem}
-                                alt={`Presente ${i + 1}`}
-                                width={200}
-                                height={200}
-                                className="rounded-md"
-                            />
+                            <div className="w-48 h-48 overflow-hidden flex items-center justify-center rounded-md">
+                                <Image
+                                    src={presente.imagem}
+                                    alt={`Presente ${i + 1}`}
+                                    width={200}
+                                    height={200}
+                                    className="rounded-md object-cover max-w-full max-h-full"
+                                />
+                            </div>
                             <h3 className="my-4 text-lg text-black font-bold">{presente.nome}</h3>
-                            <p className="text-black mb-2">{presente.descricao.length < 100 ? presente.descricao : `${presente.descricao.substring(0, 30)}...`}</p>
+                            <p className="text-black mb-2">
+                                {presente.descricao.length < 100
+                                    ? presente.descricao
+                                    : `${presente.descricao.substring(0, 30)}...`}
+                            </p>
                             <p className="text-black mb-2">Quantidade desejada: {presente.quantidade}</p>
                             <p className="text-black mb-4">Quantidade presenteada: {presente.quantidadeComprado}</p>
-                            <button className="bg-marronzim text-white py-2 px-4 rounded-md hover:bg-marronzim-escuro transition-colors duration-200"
-                            >
+                            <button className="bg-marronzim text-white py-2 px-4 rounded-md hover:bg-marronzim-escuro transition-colors duration-200">
                                 Presentear
                             </button>
                         </div>
+
                     ))}
                 </div>
             )}
 
             {modalVisible && presenteSelecionado && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-                    <div className="bg-white p-4 lg:p-6 rounded-lg shadow-lg lg:w-1/3 md:w-1/2 w-11/12">
-                        <h2 className="text-xl font-bold text-center mb-4">Confirmar Presente</h2>
+                    <div className="bg-white p-6 lg:p-8 rounded-lg shadow-lg lg:w-1/3 md:w-1/2 w-11/12 max-h-[90vh] overflow-y-auto">
+                        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Confirmar Presente</h2>
 
-                        <div className="mb-4 flex justify-center">
+                        <div className="w-48 h-48 mx-auto mb-6 overflow-hidden flex items-center justify-center rounded-md">
                             <Image
                                 src={presenteSelecionado.imagem}
-                                alt={presenteSelecionado.nome}
-                                width={150}
-                                height={150}
-                                className="rounded-md"
+                                alt="Presente"
+                                width={200}
+                                height={200}
+                                className="rounded-md object-cover max-w-full max-h-full"
                             />
                         </div>
 
-                        <div className="mb-2">
+                        <div className="mb-4">
                             <p className="font-bold text-gray-700">Nome:</p>
                             <p className="text-gray-600 text-sm">{presenteSelecionado.nome}</p>
                         </div>
 
-                        <div className="mb-2">
+                        <div className="mb-4">
                             <p className="font-bold text-gray-700">Descrição:</p>
                             <p className="text-gray-600 text-sm">{presenteSelecionado.descricao}</p>
                         </div>
 
-                        <div className="mb-2">
+                        <div className="mb-4">
                             <p className="font-bold text-gray-700">Quantidade desejada:</p>
                             <p className="text-gray-600 text-sm">{presenteSelecionado.quantidade}</p>
                         </div>
 
-                        <div className="mb-2">
-                            <p className="font-bold text-gray-700">Quantidade já presenteado:</p>
+                        <div className="mb-4">
+                            <p className="font-bold text-gray-700">Quantidade já presenteada:</p>
                             <p className="text-gray-600 text-sm">{presenteSelecionado.quantidadeComprado}</p>
                         </div>
 
-                        <div className="mb-4">
+                        <div className="mb-6">
                             <p className="font-bold text-gray-700">Quantidade a presentear:</p>
                             <input
                                 type="number"
@@ -242,16 +248,16 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                             />
                         </div>
 
-                        <div className="flex justify-end gap-3">
+                        <div className="flex justify-end gap-4">
                             <button
                                 onClick={fecharModal}
-                                className="bg-gray-500 text-white text-sm py-2 px-3 rounded-md hover:bg-gray-600 transition"
+                                className="bg-gray-500 text-white text-sm py-2 px-4 rounded-md hover:bg-gray-600 transition-colors"
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={confirmarPresentear}
-                                className="bg-verde text-white text-sm py-2 px-3 rounded-md hover:bg-verde-escuro transition"
+                                className="bg-verde text-white text-sm py-2 px-4 rounded-md hover:bg-verde-escuro transition-colors"
                             >
                                 Confirmar
                             </button>
