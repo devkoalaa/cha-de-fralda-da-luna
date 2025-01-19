@@ -17,8 +17,9 @@ export default function Evento() {
                 width={900}
                 height={900}
                 priority
-                className="w-full h-full"
+                className="w-full h-full mb-10"
             />
+            <iframe src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d691.398462020139!2d-47.99893922098081!3d-15.999263941952776!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTXCsDU5JzU3LjciUyA0N8KwNTknNTUuMSJX!5e1!3m2!1spt-BR!2sbr!4v1737258420134!5m2!1spt-BR!2sbr" loading="lazy" className="rounded-xl h-[500px] w-full md:h-[450px] md:w-[600px]"></iframe>
         </div>
     );
 }
