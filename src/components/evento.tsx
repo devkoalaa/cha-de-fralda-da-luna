@@ -5,7 +5,7 @@ export default function Evento() {
         <div className="flex flex-col items-center justify-start min-h-screen px-4">
             <Image
                 src="/images/local.png"
-                alt="Luana"
+                alt="Local"
                 width={900}
                 height={900}
                 priority
@@ -13,12 +13,12 @@ export default function Evento() {
             />
             <Image
                 src="/images/data.png"
-                alt="Luana"
+                alt="Data"
                 width={900}
                 height={900}
                 priority
                 className="w-full h-full"
             />
         </div>
-    )
+    );
 }

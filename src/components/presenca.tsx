@@ -184,7 +184,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
     };
 
     return (
-        <div className="flex flex-col items-center justify-start px-4 gap-3">
+        <div className="flex flex-col items-center justify-start px-4 gap-3 min-h-screen">
             <h1 className="text-3xl font-bold text-black text-center">
                 {!presenca ? "Confirme sua presença!" : "Presença confirmada!"}</h1>
             <ToastContainer />
