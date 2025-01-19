@@ -174,7 +174,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                         <div
                             onClick={() => abrirModal(presente)}
                             key={i}
-                            className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 sm:hover:scale-105"
+                            className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 cursor-pointer sm:hover:scale-105"
                         >
                             <Image
                                 src={presente.imagem}

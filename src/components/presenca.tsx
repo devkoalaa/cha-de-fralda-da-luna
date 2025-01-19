@@ -295,7 +295,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                     }`}
                             >
                                 {presenca?.selectedGifts.map((presente, i) => (
-                                    <div key={i} className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 sm:hover:scale-105">
+                                    <div key={i} className="flex flex-col items-center p-4 bg-white shadow-md rounded-md">
                                         <Image
                                             src={presente.gift.image}
                                             alt={`Presente ${i + 1}`}
