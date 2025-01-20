@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Chá de Fralda da Luna",
-  description: "Created by @devkoala",
+  description: "Created by @devkoalaa",
 };
 
 export default function RootLayout({
