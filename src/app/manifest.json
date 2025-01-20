@@ -1,6 +1,7 @@
 {
   "name": "Chá de Fralda da Luna",
   "short_name": "Chá da Luna",
+  "start_url": "/convidados",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
