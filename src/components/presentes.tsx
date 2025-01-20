@@ -164,47 +164,48 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
 
     return (
         <div className="flex flex-col items-center justify-start min-h-screen px-4 gap-3">
-            <h1 className="text-3xl font-bold text-black text-center">Lista de Presentes</h1>
-            <ToastContainer />
             {loading ? (
                 <Loading xl alternativeColor />
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-                    {presentes.map((presente, i) => (
-                        <div
-                            onClick={() => abrirModal(presente)}
-                            key={i}
-                            className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 cursor-pointer sm:hover:scale-105"
-                        >
-                            <div className="w-48 h-48 overflow-hidden flex items-center justify-center rounded-md">
-                                <Image
-                                    src={presente.imagem}
-                                    alt={`Presente ${i + 1}`}
-                                    width={200}
-                                    height={200}
-                                    className="rounded-md object-cover max-w-full max-h-full"
-                                />
+                <>
+                    <h1 className="text-3xl font-bold text-black text-center mb-2">Lista de Presentes</h1>
+                    <ToastContainer />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+                        {presentes.map((presente, i) => (
+                            <div
+                                onClick={() => abrirModal(presente)}
+                                key={i}
+                                className="flex flex-col items-center p-4 bg-white shadow-md rounded-md transform transition-transform duration-300 cursor-pointer sm:hover:scale-105 h-150"
+                            >
+                                <div className="w-48 h-48 overflow-hidden flex items-center justify-center rounded-md">
+                                    <Image
+                                        src={presente.imagem}
+                                        alt={`Presente ${i + 1}`}
+                                        width={200}
+                                        height={200}
+                                        className="rounded-md object-cover max-w-full max-h-full"
+                                    />
+                                </div>
+                                <h3 className="my-4 text-lg text-black font-bold">{presente.nome}</h3>
+                                <p className="text-black mb-4 overflow-hidden text-ellipsis" style={{ WebkitLineClamp: 3, display: '-webkit-box', WebkitBoxOrient: 'vertical' }}>
+                                    {presente.descricao}
+                                </p>
+                                <div className="flex flex-grow flex-col justify-between w-full">
+                                    <p className="text-black mb-2 font-bold">Quantidade desejada: {presente.quantidade}</p>
+                                    <p className="text-black mb-4 font-bold">Quantidade presenteada: {presente.quantidadeComprado}</p>
+                                    <button className="bg-marronzim text-white py-2 px-4 rounded-md hover:bg-marronzim-escuro transition-colors duration-200">
+                                        Presentear
+                                    </button>
+                                </div>
                             </div>
-                            <h3 className="my-4 text-lg text-black font-bold">{presente.nome}</h3>
-                            <p className="text-black mb-2">
-                                {presente.descricao.length < 100
-                                    ? presente.descricao
-                                    : `${presente.descricao.substring(0, 30)}...`}
-                            </p>
-                            <p className="text-black mb-2">Quantidade desejada: {presente.quantidade}</p>
-                            <p className="text-black mb-4">Quantidade presenteada: {presente.quantidadeComprado}</p>
-                            <button className="bg-marronzim text-white py-2 px-4 rounded-md hover:bg-marronzim-escuro transition-colors duration-200">
-                                Presentear
-                            </button>
-                        </div>
-
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                </>
             )}
 
             {modalVisible && presenteSelecionado && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-                    <div className="bg-white p-6 lg:p-8 rounded-lg shadow-lg lg:w-1/3 md:w-1/2 w-11/12 max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white p-6 lg:p-8 rounded-lg shadow-lg lg:w-1/3 md:w-1/2 w-10/12 max-h-[90vh] overflow-y-auto">
                         <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Confirmar Presente</h2>
 
                         <div className="w-48 h-48 mx-auto mb-6 overflow-hidden flex items-center justify-center rounded-md">

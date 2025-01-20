@@ -194,175 +194,176 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
 
     return (
         <div className="flex flex-col items-center justify-start px-4 gap-3 min-h-screen">
-            <h1 className="text-3xl font-bold text-black text-center">
-                {!presenca ? "Confirme sua presença!" : "Presença confirmada!"}</h1>
-            <ToastContainer />
-            {loadingGet
-                ? <Loading xl alternativeColor />
-                : <form
-                    onSubmit={handleSubmit}
-                    className="w-full max-w-xl space-y-6"
-                >
-                    {/* Campo Nome */}
-                    <div>
-                        <label className="block mb-1 text-black font-bold">
-                            Nome
-                        </label>
-                        {presenca
-                            ?
-                            <label className="block mb-1 text-black">
-                                {presenca.name ?? "Sem nome"}
+            {loadingGet ? <Loading xl alternativeColor /> :
+                <>
+                    <h1 className="text-3xl font-bold text-black text-center">
+                        {!presenca ? "Confirme sua presença!" : "Presença confirmada!"}</h1>
+                    <ToastContainer />
+                    <form
+                        onSubmit={handleSubmit}
+                        className="w-full max-w-xl space-y-6"
+                    >
+                        {/* Campo Nome */}
+                        <div>
+                            <label className="block mb-1 text-black font-bold">
+                                Nome
                             </label>
-                            : <input
-                                type="text"
-                                name="nome"
-                                placeholder="Seu nome!"
-                                value={formData.nome}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-3 py-2 border rounded-md text-black"
-                            />}
-                    </div>
-
-                    {/* Campo Telefone */}
-                    <div>
-                        <label className="block mb-1 text-black font-bold">
-                            Telefone
-                        </label>
-                        {
-                            presenca
+                            {presenca
                                 ?
                                 <label className="block mb-1 text-black">
-                                    {presenca.phone ?? "Sem telefone"}
+                                    {presenca.name ?? "Sem nome"}
                                 </label>
-                                :
-                                <InputMask
-                                    name="telefone"
-                                    className="w-full px-3 py-2 border rounded-md text-black"
-                                    mask="(__) _____-____"
+                                : <input
+                                    type="text"
+                                    name="nome"
+                                    placeholder="Seu nome!"
+                                    value={formData.nome}
                                     onChange={handleChange}
-                                    replacement={{ _: /\d/ }}
-                                    placeholder="(99) 99999-9999"
                                     required
-                                    value={formData.telefone}
-                                />
-                        }
-                    </div>
+                                    className="w-full px-3 py-2 border rounded-md text-black"
+                                />}
+                        </div>
 
-                    {/* Campo Acompanhantes */}
-                    <div>
-                        <label className="block mb-1 text-black font-bold">
-                            Nº de acompanhantes (sem contar você)
-                        </label>
-                        <div className="flex space-x-4">
-                            <div className="w-1/2">
-                                <label className="block mb-1 text-black font-bold">
-                                    Adultos
-                                </label>
-                                {presenca
-                                    ? <label className="block mb-1 text-black font-medium">
-                                        {presenca.acompanhantesAdultos}
+                        {/* Campo Telefone */}
+                        <div>
+                            <label className="block mb-1 text-black font-bold">
+                                Telefone
+                            </label>
+                            {
+                                presenca
+                                    ?
+                                    <label className="block mb-1 text-black">
+                                        {presenca.phone ?? "Sem telefone"}
                                     </label>
-                                    : <InputMask
-                                        name="acompanhantesAdultos"
-                                        className="w-full px-3 py-2 border rounded-md text-black text-medium"
-                                        mask="__"
+                                    :
+                                    <InputMask
+                                        name="telefone"
+                                        className="w-full px-3 py-2 border rounded-md text-black"
+                                        mask="(__) _____-____"
                                         onChange={handleChange}
                                         replacement={{ _: /\d/ }}
-                                        placeholder="Adultos"
+                                        placeholder="(99) 99999-9999"
                                         required
-                                        min={0}
-                                        max={10}
-                                    />}
-                            </div>
-                            <div className="w-1/2">
-                                <label className="block mb-1 text-black font-bold">
-                                    Crianças
-                                </label>
-                                {presenca
-                                    ? <label className="block mb-1 text-black font-medium">
-                                        {presenca.acompanhantesCriancas}
+                                        value={formData.telefone}
+                                    />
+                            }
+                        </div>
+
+                        {/* Campo Acompanhantes */}
+                        <div>
+                            <label className="block mb-1 text-black font-bold">
+                                Nº de acompanhantes (sem contar você)
+                            </label>
+                            <div className="flex space-x-4">
+                                <div className="w-1/2">
+                                    <label className="block mb-1 text-black font-bold">
+                                        Adultos
                                     </label>
-                                    : <InputMask
-                                        name="acompanhantesCriancas"
-                                        className="w-full px-3 py-2 border rounded-md text-black text-medium"
-                                        mask="__"
-                                        onChange={handleChange}
-                                        replacement={{ _: /\d/ }}
-                                        placeholder="Crianças"
-                                        required
-                                        min={0}
-                                        max={10}
-                                    />}
+                                    {presenca
+                                        ? <label className="block mb-1 text-black font-medium">
+                                            {presenca.acompanhantesAdultos}
+                                        </label>
+                                        : <InputMask
+                                            name="acompanhantesAdultos"
+                                            className="w-full px-3 py-2 border rounded-md text-black text-medium"
+                                            mask="__"
+                                            onChange={handleChange}
+                                            replacement={{ _: /\d/ }}
+                                            placeholder="Adultos"
+                                            required
+                                            min={0}
+                                            max={10}
+                                        />}
+                                </div>
+                                <div className="w-1/2">
+                                    <label className="block mb-1 text-black font-bold">
+                                        Crianças
+                                    </label>
+                                    {presenca
+                                        ? <label className="block mb-1 text-black font-medium">
+                                            {presenca.acompanhantesCriancas}
+                                        </label>
+                                        : <InputMask
+                                            name="acompanhantesCriancas"
+                                            className="w-full px-3 py-2 border rounded-md text-black text-medium"
+                                            mask="__"
+                                            onChange={handleChange}
+                                            replacement={{ _: /\d/ }}
+                                            placeholder="Crianças"
+                                            required
+                                            min={0}
+                                            max={10}
+                                        />}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Presentes */}
-                    {hasPresente &&
-                        <>
-                            <label className="block mb-1 text-black font-bold">
-                                Seus presentes
-                            </label>
-                            <div
-                                className={`grid gap-8 w-full ${presenca?.selectedGifts.length === 1
-                                    ? "grid-cols-1 justify-center"
-                                    : "sm:grid-cols-2 lg:grid-cols-2"
-                                    }`}
-                            >
-                                {presenca?.selectedGifts.map((presente, i) => (
-                                    <div
-                                        key={i}
-                                        className="flex flex-col items-center p-4 bg-white shadow-md rounded-md"
-                                    >
-                                        <div className="w-48 h-48 overflow-hidden flex items-center justify-center rounded-md">
-                                            <Image
-                                                src={presente.gift.image}
-                                                alt={`Presente ${i + 1}`}
-                                                width={200}
-                                                height={200}
-                                                className="object-contain w-full h-full"
-                                            />
+                        {/* Presentes */}
+                        {hasPresente &&
+                            <>
+                                <label className="block mb-1 text-black font-bold">
+                                    Seus presentes
+                                </label>
+                                <div
+                                    className={`grid gap-8 w-full ${presenca?.selectedGifts.length === 1
+                                        ? "grid-cols-1 justify-center"
+                                        : "sm:grid-cols-2 lg:grid-cols-2"
+                                        }`}
+                                >
+                                    {presenca?.selectedGifts.map((presente, i) => (
+                                        <div
+                                            key={i}
+                                            className="flex flex-col items-center p-4 bg-white shadow-md rounded-md"
+                                        >
+                                            <div className="w-48 h-48 overflow-hidden flex items-center justify-center rounded-md">
+                                                <Image
+                                                    src={presente.gift.image}
+                                                    alt={`Presente ${i + 1}`}
+                                                    width={200}
+                                                    height={200}
+                                                    className="object-contain w-full h-full"
+                                                />
+                                            </div>
+                                            <h3 className="my-4 text-lg text-center text-black font-bold">{presente.gift.name}</h3>
+                                            <p className="text-black mb-2 text-sm text-center">
+                                                {presente.gift.description.length < 30
+                                                    ? presente.gift.description
+                                                    : `${presente.gift.description.substring(0, 30)}...`}
+                                            </p>
+                                            <p className="text-black mb-2 text-sm text-center">
+                                                Quantidade reservada por você: <span className="font-bold">{presente.quantity}</span>
+                                            </p>
                                         </div>
-                                        <h3 className="my-4 text-lg text-center text-black font-bold">{presente.gift.name}</h3>
-                                        <p className="text-black mb-2 text-sm text-center">
-                                            {presente.gift.description.length < 30
-                                                ? presente.gift.description
-                                                : `${presente.gift.description.substring(0, 30)}...`}
-                                        </p>
-                                        <p className="text-black mb-2 text-sm text-center">
-                                            Quantidade reservada por você: <span className="font-bold">{presente.quantity}</span>
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </>
-                    }
+                                    ))}
+                                </div>
+                            </>
+                        }
 
-                    {/* Botão de Enviar */}
-                    {
-                        presenca
-                            ? <button onClick={() => acao('presentes')}
-                                className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
-                            >
-                                Presentear
-                            </button>
-                            : <button
-                                type="submit"
-                                className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
-                            >
-                                Confirmar
-                            </button>
-                    }
-                    <button type="button" onClick={() => {
-                        localStorage.clear()
-                        location.reload()
-                    }}
-                        className="w-full px-4 py-2 border rounded-md bg-red-700 text-white font-medium"
-                    >
-                        Limpar
-                    </button>
-                </form >}
+                        {/* Botão de Enviar */}
+                        {
+                            presenca
+                                ? <button onClick={() => acao('presentes')}
+                                    className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
+                                >
+                                    Presentear
+                                </button>
+                                : <button
+                                    type="submit"
+                                    className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
+                                >
+                                    Confirmar
+                                </button>
+                        }
+                        <button type="button" onClick={() => {
+                            localStorage.clear()
+                            location.reload()
+                        }}
+                            className="w-full px-4 py-2 border rounded-md bg-red-700 text-white font-medium"
+                        >
+                            Limpar
+                        </button>
+                    </form>
+                </>}
 
             {
                 modalVisible && (
@@ -421,6 +422,6 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                     </div>
                 )
             }
-        </div >
+        </div>
     );
 }
