@@ -75,16 +75,20 @@ export default function Convidados() {
                     <td className="px-4 py-2 border-b text-sm md:text-base">
                       {convidado.acompanhantesAdultos} Adultos, {convidado.acompanhantesCriancas} Crianças
                     </td>
-                    <td className="px-4 py-2 border-b text-sm md:text-base">
-                      {convidado.selectedGifts.length > 0 ? convidado.selectedGifts.map((gift, idx) => (
-                        <div key={idx} className="mb-2">
-                          <p className="font-bold">{gift.gift.name}</p>
-                          <p>Quantidade: {gift.quantity}</p>
-                        </div>
-                      )) : <div className="mb-2">
-                        <p className="font-bold">Sem presente</p>
-                      </div>}
-                    </td>
+                    {convidado.selectedGifts.length > 0 ?
+                      <td className="px-4 py-2 border-b text-sm md:text-base">
+                        {convidado.selectedGifts.map((gift, idx) => (
+                          <div key={idx} className="mb-2">
+                            <p className="font-bold">{gift.gift.name}</p>
+                            <p>Quantidade: {gift.quantity}</p>
+                          </div>
+                        ))}
+                      </td> : (
+                        <td className="px-4 py-2 border-b font-bold text-sm md:text-base">
+                          Sem presentes
+                        </td>
+                      )
+                    }
                   </tr>
                 ))}
               </tbody>
