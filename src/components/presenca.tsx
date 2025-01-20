@@ -354,14 +354,6 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                     Confirmar
                                 </button>
                         }
-                        <button type="button" onClick={() => {
-                            localStorage.clear()
-                            location.reload()
-                        }}
-                            className="w-full px-4 py-2 border rounded-md bg-red-700 text-white font-medium"
-                        >
-                            Limpar
-                        </button>
                     </form>
                 </>}
 
