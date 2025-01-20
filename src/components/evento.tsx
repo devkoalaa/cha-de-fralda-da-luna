@@ -28,7 +28,7 @@ export default function Evento() {
                 <div className="border-4 border-verde rounded-xl overflow-hidden shadow-xl">
                     <iframe
                         src={mapUrl.src}
-                        loading="lazy"
+                        loading="eager"
                         className="h-[500px] w-full"
                     ></iframe>
                 </div>

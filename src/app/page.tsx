@@ -29,6 +29,11 @@ export default function Home() {
     window.scrollTo(0, 0)
   }, [screenSelected])
 
+  const handleScreen = (screen: string) => {
+    setMenuOpen(false)
+    setScreenSelected(screen)
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen border-marronzim border-solid border-8 rounded-2xl lg:bg-cover lg:bg-center" style={{ backgroundImage: 'url(/images/background.png)' }}>
       <div className="flex flex-col items-center justify-between font-[family-name:var(--font-geist-sans)] shadow-2xl rounded-xl w-full m-0.8">
@@ -47,25 +52,25 @@ export default function Home() {
             {/* Os itens do menu */}
             <div
               className={`flex-auto text-center text-white px-2 cursor-pointer hover:brightness-75 relative ${screenSelected === 'home' ? 'after:content-[""] after:absolute after:bottom-[-8px] after:left-0 after:right-0 after:h-[2px] after:bg-white' : ''}`}
-              onClick={() => setScreenSelected('home')}
+              onClick={() => handleScreen('home')}
             >
               Home
             </div>
             <div
               className={`flex-auto text-center text-white px-2 cursor-pointer hover:brightness-75 relative ${screenSelected === 'presentes' ? 'after:content-[""] after:absolute after:bottom-[-8px] after:left-0 after:right-0 after:h-[2px] after:bg-white' : ''}`}
-              onClick={() => setScreenSelected('presentes')}
+              onClick={() => handleScreen('presentes')}
             >
               Lista de Presentes
             </div>
             <div
               className={`flex-auto text-center text-white px-2 cursor-pointer hover:brightness-75 relative ${screenSelected.startsWith('presenca') ? 'after:content-[""] after:absolute after:bottom-[-8px] after:left-0 after:right-0 after:h-[2px] after:bg-white' : ''}`}
-              onClick={() => setScreenSelected('presenca')}
+              onClick={() => handleScreen('presenca')}
             >
               Confirmar Presença
             </div>
             <div
               className={`flex-auto text-center text-white px-2 cursor-pointer hover:brightness-75 relative ${screenSelected === 'evento' ? 'after:content-[""] after:absolute after:bottom-[-8px] after:left-0 after:right-0 after:h-[2px] after:bg-white' : ''}`}
-              onClick={() => setScreenSelected('evento')}
+              onClick={() => handleScreen('evento')}
             >
               Evento
             </div>
@@ -97,25 +102,25 @@ export default function Home() {
               >
                 <div
                   className={`w-full text-center text-white px-2 py-2 cursor-pointer ${screenSelected === 'home' ? 'bg-verde' : ''}`}
-                  onClick={() => setScreenSelected('home')}
+                  onClick={() => handleScreen('home')}
                 >
                   Home
                 </div>
                 <div
                   className={`w-full text-center text-white px-2 py-2 cursor-pointer ${screenSelected === 'presentes' ? 'bg-verde' : ''}`}
-                  onClick={() => setScreenSelected('presentes')}
+                  onClick={() => handleScreen('presentes')}
                 >
                   Lista de Presentes
                 </div>
                 <div
                   className={`w-full text-center text-white px-2 py-2 cursor-pointer ${screenSelected.startsWith('presenca') ? 'bg-verde' : ''}`}
-                  onClick={() => setScreenSelected('presenca')}
+                  onClick={() => handleScreen('presenca')}
                 >
                   Confirmar Presença
                 </div>
                 <div
                   className={`w-full text-center text-white px-2 py-2 cursor-pointer ${screenSelected === 'evento' ? 'bg-verde' : ''}`}
-                  onClick={() => setScreenSelected('evento')}
+                  onClick={() => handleScreen('evento')}
                 >
                   Evento
                 </div>
