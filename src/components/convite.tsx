@@ -66,16 +66,16 @@ export default function Convite() {
             <p className="text-lg text-gray-700 mt-4">
                 Com imensa alegria, convidamos vocês para o Chá de Bebê da <span className="font-bold">Luna</span>.
             </p>
-            <p className="text-lg text-gray-700 mt-2">
+            <p className="text-lg text-gray-700">
                 Vamos nos divertir, compartilhar sorrisos e todo o carinho nesse dia tão aguardado.
             </p>
-            <p className="text-lg text-gray-700 mt-2">
+            <p className="text-lg text-gray-700">
                 Para presentear <span className="font-bold">Luna</span> é só acessar a <span className="font-bold">lista de presentes</span> e escolher o que preferir.
             </p>
-            <p className="text-lg text-gray-700 mt-2">
+            <p className="text-lg text-gray-700">
                 Cada mimo será recebido com muito carinho! 😊
             </p>
-            <p className="text-lg text-gray-700 mt-4">Aguardamos vocês!</p>
+            <p className="text-lg text-gray-700">Aguardamos vocês!</p>
         </div >
     );
 }

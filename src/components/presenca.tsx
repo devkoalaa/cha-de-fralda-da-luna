@@ -52,6 +52,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
     const [modalVisible, setModalVisible] = useState(false);
     const [loadingGet, setLoadingGet] = useState(false);
     const [loadingPost, setLoadingPost] = useState(false);
+    const [phoneSearched, setPhoneSearched] = useState(false);
     const [formData, setFormData] = useState<PresencaData>({
         nome: "",
         telefone: "",
@@ -98,6 +99,51 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
             getPresence();
         }
     }, []);
+
+    const handlePhoneChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            telefone: value,
+        }));
+
+        if (phoneSearched) return
+
+        if (value.length === 15) {
+            const getPresence = async () => {
+
+                try {
+                    setLoadingGet(true)
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presenceByPhone/${value}`);
+
+                    if (response.status === 404) {
+                        setPhoneSearched(true)
+                        return;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error('Erro ao buscar os dados.');
+                    }
+
+                    const presenceData: PresencaDataResponse = await response.json();
+                    setPresenca(presenceData);
+                    const presenceId = presenceData.id;
+                    localStorage.setItem("luna-storage-presencaId", presenceId);
+
+                    if (presenceData.selectedGifts.length > 0) {
+                        setHasPresente(true);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    toast('Erro ao buscar os dados. Tente novamente mais tarde.', toastError);
+                } finally {
+                    setLoadingGet(false)
+                }
+            };
+
+            getPresence();
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -204,25 +250,28 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                         className="w-full max-w-xl space-y-6"
                     >
                         {/* Campo Nome */}
-                        <div>
+                        {(phoneSearched || presenca) && <div>
                             <label className="block mb-1 text-black font-bold">
                                 Nome
                             </label>
-                            {presenca
-                                ?
-                                <label className="block mb-1 text-black">
-                                    {presenca.name ?? "Sem nome"}
-                                </label>
-                                : <input
-                                    type="text"
-                                    name="nome"
-                                    placeholder="Seu nome!"
-                                    value={formData.nome}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-3 py-2 border rounded-md text-black"
-                                />}
+                            {
+                                presenca
+                                    ?
+                                    <label className="block mb-1 text-black">
+                                        {presenca.name ?? "Sem nome"}
+                                    </label>
+                                    : <input
+                                        type="text"
+                                        name="nome"
+                                        placeholder="Seu nome!"
+                                        value={formData.nome}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-3 py-2 border rounded-md text-black"
+                                    />
+                            }
                         </div>
+                        }
 
                         {/* Campo Telefone */}
                         <div>
@@ -240,7 +289,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                         name="telefone"
                                         className="w-full px-3 py-2 border rounded-md text-black"
                                         mask="(__) _____-____"
-                                        onChange={handleChange}
+                                        onChange={handlePhoneChange}
                                         replacement={{ _: /\d/ }}
                                         placeholder="(99) 99999-9999"
                                         required
@@ -250,7 +299,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                         </div>
 
                         {/* Campo Acompanhantes */}
-                        <div>
+                        {(phoneSearched || presenca) && <div>
                             <label className="block mb-1 text-black font-bold">
                                 Nº de acompanhantes (sem contar você)
                             </label>
@@ -297,6 +346,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                 </div>
                             </div>
                         </div>
+                        }
 
                         {/* Presentes */}
                         {hasPresente &&
@@ -343,16 +393,16 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                         {
                             presenca
                                 ? <button onClick={() => acao('presentes')}
-                                    className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
-                                >
+                                    className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium">
                                     Presentear
                                 </button>
-                                : <button
-                                    type="submit"
-                                    className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium"
-                                >
-                                    Confirmar
-                                </button>
+                                : phoneSearched
+                                    ? <button
+                                        type="submit"
+                                        className="w-full px-4 py-2 border rounded-md bg-verde text-white font-medium">
+                                        Confirmar
+                                    </button>
+                                    : null
                         }
                     </form>
                 </>}
