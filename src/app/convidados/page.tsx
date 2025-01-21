@@ -1,52 +1,52 @@
-'use client';
-import { Convidado } from "@/interfaces/convidados";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+'use client'
+import { Convidado } from '@/interfaces/convidados'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export default function Convidados() {
-  const [convidados, setConvidados] = useState<Convidado[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
-  const router = useRouter();
+  const [convidados, setConvidados] = useState<Convidado[]>([])
+  const [isMobile, setIsMobile] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+      setIsMobile(window.matchMedia('(max-width: 768px)').matches)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     try {
       const getConvidados = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence`);
-        const data = await response.json();
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence`)
+        const data = await response.json()
 
-        console.log(data);
-        setConvidados(data);
-      };
+        console.log(data)
+        setConvidados(data)
+      }
 
-      getConvidados();
+      getConvidados()
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  }, []);
+  }, [])
 
-  const totalConvidados = convidados.length;
+  const totalConvidados = convidados.length
   const totalAcompanhantesAdultos = convidados.reduce(
     (total, convidado) => total + convidado.acompanhantesAdultos,
     0
-  );
+  )
   const totalAcompanhantesCriancas = convidados.reduce(
     (total, convidado) => total + convidado.acompanhantesCriancas,
     0
-  );
+  )
   const totalPresentes = convidados.reduce(
     (total, convidado) => total + convidado.selectedGifts.reduce((sum, gift) => sum + gift.quantity, 0),
     0
-  );
+  )
 
   return (
     <div
@@ -78,13 +78,13 @@ export default function Convidados() {
                   <h3 className="font-bold text-lg">{convidado.name}</h3>
                   <p>Telefone: {convidado.phone}</p>
                   <p>
-                    Data de Criação:{" "}
+                    Data de Criação:{' '}
                     {new Date(convidado.createdAt).toLocaleString('pt-BR', {
                       timeZone: 'America/Sao_Paulo',
                     })}
                   </p>
                   <p>
-                    Acompanhantes: {convidado.acompanhantesAdultos} Adultos,{" "}
+                    Acompanhantes: {convidado.acompanhantesAdultos} Adultos,{' '}
                     {convidado.acompanhantesCriancas} Crianças
                   </p>
                   <div>
@@ -105,7 +105,7 @@ export default function Convidados() {
               <div className="border border-marronzim rounded-lg p-4 m-4 bg-gray-200">
                 <p>Total de Convidados: {totalConvidados}</p>
                 <p>
-                  Total de Acompanhantes: {totalAcompanhantesAdultos} Adultos,{" "}
+                  Total de Acompanhantes: {totalAcompanhantesAdultos} Adultos,{' '}
                   {totalAcompanhantesCriancas} Crianças
                 </p>
                 <p>Total de Presentes: {totalPresentes}</p>
@@ -148,7 +148,7 @@ export default function Convidados() {
                         })}
                       </td>
                       <td className="px-4 py-2 border-b text-sm md:text-base">
-                        {convidado.acompanhantesAdultos} Adultos,{" "}
+                        {convidado.acompanhantesAdultos} Adultos,{' '}
                         {convidado.acompanhantesCriancas} Crianças
                       </td>
                       {convidado.selectedGifts.length > 0 ? (
@@ -190,5 +190,5 @@ export default function Convidados() {
           ))}
       </div>
     </div>
-  );
+  )
 }

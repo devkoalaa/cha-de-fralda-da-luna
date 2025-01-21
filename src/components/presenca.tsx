@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { toastError, toastSuccess } from "@/utils/toastOptions";
-import { InputMask } from '@react-input/mask';
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import Loading from "./Loading";
+import { toastError, toastSuccess } from '@/utils/toastOptions'
+import { InputMask } from '@react-input/mask'
+import Image from 'next/image'
+import React, { useEffect, useState } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
+import Loading from './Loading'
 
 interface PresencaData {
     nome: string;
@@ -49,63 +50,63 @@ interface PresentePresenteado {
 export default function Presenca({ acao, tag }: { acao: (tela: string) => void, tag: string }) {
     const [presenca, setPresenca] = useState<PresencaDataResponse | null>(null)
     const [hasPresente, setHasPresente] = useState(false)
-    const [modalVisible, setModalVisible] = useState(false);
-    const [loadingGet, setLoadingGet] = useState(false);
-    const [loadingPost, setLoadingPost] = useState(false);
-    const [phoneSearched, setPhoneSearched] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false)
+    const [loadingGet, setLoadingGet] = useState(false)
+    const [loadingPost, setLoadingPost] = useState(false)
+    const [phoneSearched, setPhoneSearched] = useState(false)
     const [formData, setFormData] = useState<PresencaData>({
-        nome: "",
-        telefone: "",
+        nome: '',
+        telefone: '',
         acompanhantesAdultos: null,
         acompanhantesCriancas: null,
-    });
+    })
 
     useEffect(() => {
-        if (tag === 'presenca-e') toast('Você deve confirmar presença!', toastError);
+        if (tag === 'presenca-e') toast('Você deve confirmar presença!', toastError)
 
-        const presencaId = localStorage.getItem("luna-storage-presencaId");
+        const presencaId = localStorage.getItem('luna-storage-presencaId')
 
         const getPresence = async () => {
-            setLoadingGet(true);
+            setLoadingGet(true)
 
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence/${presencaId}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presence/${presencaId}`)
 
                 if (response.status === 404) {
-                    localStorage.removeItem("luna-storage-presencaId");
-                    setLoadingGet(false);
-                    return;
+                    localStorage.removeItem('luna-storage-presencaId')
+                    setLoadingGet(false)
+                    return
                 }
 
                 if (!response.ok) {
-                    throw new Error('Erro ao buscar os dados.');
+                    throw new Error('Erro ao buscar os dados.')
                 }
 
-                const presenceData: PresencaDataResponse = await response.json();
-                setPresenca(presenceData);
+                const presenceData: PresencaDataResponse = await response.json()
+                setPresenca(presenceData)
 
                 if (presenceData.selectedGifts.length > 0) {
-                    setHasPresente(true);
+                    setHasPresente(true)
                 }
             } catch (error) {
-                console.error(error);
-                toast('Erro ao buscar os dados. Tente novamente mais tarde.', toastError);
+                console.error(error)
+                toast('Erro ao buscar os dados. Tente novamente mais tarde.', toastError)
             } finally {
-                setLoadingGet(false);
+                setLoadingGet(false)
             }
-        };
+        }
 
         if (presencaId) {
-            getPresence();
+            getPresence()
         }
-    }, []);
+    }, [])
 
     const handlePhoneChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = e.target;
+        const { value } = e.target
         setFormData((prev) => ({
             ...prev,
             telefone: value,
-        }));
+        }))
 
         if (phoneSearched) return
 
@@ -114,43 +115,53 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
 
                 try {
                     setLoadingGet(true)
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presenceByPhone/${value}`);
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/presenceByPhone/${value}`)
 
                     if (response.status === 404) {
                         setPhoneSearched(true)
-                        return;
+                        return
                     }
 
                     if (!response.ok) {
-                        throw new Error('Erro ao buscar os dados.');
+                        throw new Error('Erro ao buscar os dados.')
                     }
 
-                    const presenceData: PresencaDataResponse = await response.json();
-                    setPresenca(presenceData);
-                    const presenceId = presenceData.id;
-                    localStorage.setItem("luna-storage-presencaId", presenceId);
+                    const presenceData: PresencaDataResponse = await response.json()
+                    setPresenca(presenceData)
+                    const presenceId = presenceData.id
+                    localStorage.setItem('luna-storage-presencaId', presenceId)
 
                     if (presenceData.selectedGifts.length > 0) {
-                        setHasPresente(true);
+                        setHasPresente(true)
                     }
                 } catch (error) {
-                    console.error(error);
-                    toast('Erro ao buscar os dados. Tente novamente mais tarde.', toastError);
+                    console.error(error)
+                    toast('Erro ao buscar os dados. Tente novamente mais tarde.', toastError)
                 } finally {
                     setLoadingGet(false)
                 }
-            };
+            }
 
-            getPresence();
+            getPresence()
         }
-    };
+    }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setLoadingPost(true)
-        setModalVisible(true)
+        e.preventDefault()
 
-        const presentes = JSON.parse(localStorage.getItem("luna-storage-gifts") || "[]");
+        const invalidFields = Object.entries(formData).filter(
+            ([key, value]) => typeof value === 'string' && !value.trim()
+        )
+
+        if (invalidFields.length > 0) {
+            toast('Por favor, preencha todos os campos corretamente.', toastError)
+
+            return
+        }
+
+        setLoadingGet(true)
+
+        const presentes = JSON.parse(localStorage.getItem('luna-storage-gifts') || '[]')
         if (presentes.length > 0) setHasPresente(true)
         localStorage.removeItem('luna-storage-gifts')
 
@@ -159,76 +170,79 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                 `${process.env.NEXT_PUBLIC_URL_API}/confirmPresence`,
                 {
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                     },
-                    method: "POST",
+                    method: 'POST',
                     body: JSON.stringify(formData),
                 }
-            );
+            )
+
+
+            setLoadingGet(false)
 
             if (!presenceResponse.ok) {
-                throw new Error("Erro ao confirmar presença. Tente novamente.");
+                throw new Error('Erro ao confirmar presença. Tente novamente.')
             }
 
-            const presenceData = await presenceResponse.json();
-            const presenceId = presenceData.id;
-            localStorage.setItem("luna-storage-presencaId", presenceId);
+            const presenceData = await presenceResponse.json()
+            const presenceId = presenceData.id
+            localStorage.setItem('luna-storage-presencaId', presenceId)
 
             const presenceGifts = presentes.map((presentePresenteado: PresentePresenteado) => ({
                 presenceId,
                 giftId: presentePresenteado.presente.id,
                 quantity: presentePresenteado.quantidadePresenteado,
-            }));
+            }))
 
             const giftResponse = await fetch(
                 `${process.env.NEXT_PUBLIC_URL_API}/presenceGift`,
                 {
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                     },
-                    method: "POST",
+                    method: 'POST',
                     body: JSON.stringify(presenceGifts),
                 }
-            );
+            )
 
             if (!giftResponse.ok) {
-                throw new Error("Erro ao salvar os presentes. Tente novamente.");
+                throw new Error('Erro ao salvar os presentes. Tente novamente.')
             }
 
-            toast(hasPresente ? "Presença e presentes registrados com sucesso!" : "Presença registrada com sucesso!", toastSuccess);
-            abrirModal();
+            toast(hasPresente ? 'Presença e presentes registrados com sucesso!' : 'Presença registrada com sucesso!', toastSuccess)
+            abrirModal()
         } catch (error: unknown) {
             if (error instanceof Error) {
-                console.error(error.message);
-                toast(error.message || "Ocorreu um erro. Tente novamente.", toastError);
+                console.error(error.message)
+                toast(error.message || 'Ocorreu um erro. Tente novamente.', toastError)
             } else {
-                console.error("Erro desconhecido", error);
-                toast("Ocorreu um erro inesperado. Tente novamente.", toastError);
+                console.error('Erro desconhecido', error)
+                toast('Ocorreu um erro inesperado. Tente novamente.', toastError)
             }
         } finally {
             setLoadingPost(false)
         }
-    };
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const { name, value } = e.target
 
         setFormData((prev) => ({
             ...prev,
-            [name]: name === "acompanhantesAdultos" || name === "acompanhantesCriancas"
+            [name]: name === 'acompanhantesAdultos' || name === 'acompanhantesCriancas'
                 ? Number(value)
                 : value,
-        }));
-    };
+        }))
+    }
 
     const abrirModal = () => {
-        setModalVisible(true);
-        document.body.style.overflow = "hidden";
-    };
+        setModalVisible(true)
+        document.body.style.overflow = 'hidden'
+    }
 
     const fecharModal = (encaminhar: boolean) => {
-        setModalVisible(false);
-        document.body.style.overflow = "auto";
+        setModalVisible(false)
+        document.body.style.overflow = 'auto'
 
         if (encaminhar) {
             acao('presentes')
@@ -236,14 +250,14 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
             acao('presenca')
             location.reload()
         }
-    };
+    }
 
     return (
         <div className="flex flex-col items-center justify-start px-4 gap-3 min-h-screen">
             {loadingGet ? <Loading xl alternativeColor /> :
                 <>
                     <h1 className="text-3xl font-bold text-black text-center">
-                        {!presenca ? "Confirme sua presença!" : "Presença confirmada!"}</h1>
+                        {!presenca ? 'Confirme sua presença!' : 'Presença confirmada!'}</h1>
                     <ToastContainer />
                     <form
                         onSubmit={handleSubmit}
@@ -258,7 +272,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                 presenca
                                     ?
                                     <label className="block mb-1 text-black">
-                                        {presenca.name ?? "Sem nome"}
+                                        {presenca.name ?? 'Sem nome'}
                                     </label>
                                     : <input
                                         type="text"
@@ -282,7 +296,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                 presenca
                                     ?
                                     <label className="block mb-1 text-black">
-                                        {presenca.phone ?? "Sem telefone"}
+                                        {presenca.phone ?? 'Sem telefone'}
                                     </label>
                                     :
                                     <InputMask
@@ -356,8 +370,8 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                 </label>
                                 <div
                                     className={`grid gap-8 w-full ${presenca?.selectedGifts.length === 1
-                                        ? "grid-cols-1 justify-center"
-                                        : "sm:grid-cols-2 lg:grid-cols-2"
+                                        ? 'grid-cols-1 justify-center'
+                                        : 'sm:grid-cols-2 lg:grid-cols-2'
                                         }`}
                                 >
                                     {presenca?.selectedGifts.map((presente, i) => (
@@ -410,7 +424,7 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
             {
                 modalVisible && (
                     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-                        <div className={`bg-white p-8 rounded-lg shadow-lg min-h-[200px] lg:w-1/3 md:w-1/2 w-11/12 ${loadingPost ? "flex items-center justify-center" : ""}`}>
+                        <div className={`bg-white p-8 rounded-lg shadow-lg min-h-[200px] lg:w-1/3 md:w-1/2 w-11/12 ${loadingPost ? 'flex items-center justify-center' : ''}`}>
                             {loadingPost ? (
                                 <div className="flex items-center justify-center w-full h-full">
                                     <Loading />
@@ -441,8 +455,8 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                                                 </button>
                                                 <button
                                                     onClick={() => {
-                                                        acao('presenca');
-                                                        fecharModal(true);
+                                                        acao('presenca')
+                                                        fecharModal(true)
                                                     }}
                                                     className="bg-verde text-white py-2 px-4 rounded-md hover:bg-verde-escuro-90 transition"
                                                 >
@@ -465,5 +479,5 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                 )
             }
         </div>
-    );
+    )
 }

@@ -1,8 +1,8 @@
-import { toastError, toastSuccess } from "@/utils/toastOptions";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import Loading from "./Loading";
+import { toastError, toastSuccess } from '@/utils/toastOptions'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
+import Loading from './Loading'
 
 interface Presente {
     id: string;
@@ -36,27 +36,27 @@ interface PresentePresenteado {
 }
 
 export default function Presentes({ acao }: { acao: (tela: string) => void }) {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [presenteSelecionado, setPresenteSelecionado] = useState<Presente | null>(null);
-    const [quantidadePresentear, setQuantidadePresentear] = useState(1);
-    const [presentes, setPresentes] = useState<Presente[]>([]);
-    const [presenceId, setPresencaId] = useState("");
-    const [loading, setLoading] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false)
+    const [presenteSelecionado, setPresenteSelecionado] = useState<Presente | null>(null)
+    const [quantidadePresentear, setQuantidadePresentear] = useState(1)
+    const [presentes, setPresentes] = useState<Presente[]>([])
+    const [presenceId, setPresencaId] = useState('')
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        const result = localStorage.getItem("luna-storage-presencaId");
+        const result = localStorage.getItem('luna-storage-presencaId')
 
         if (result) {
-            setPresencaId(result);
+            setPresencaId(result)
         }
 
-        getGifts();
-    }, []);
+        getGifts()
+    }, [])
 
     const getGifts = async () => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/gifts`);
-            const data = await response.json();
+            const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/gifts`)
+            const data = await response.json()
 
             const gifts: Presente[] = data.map((presente: GiftResponse) => ({
                 id: presente.id,
@@ -65,59 +65,59 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                 quantidade: presente.quantity,
                 quantidadeComprado: presente.quantityPurchased,
                 imagem: presente.image,
-            }));
+            }))
 
-            setPresentes(gifts);
+            setPresentes(gifts)
         } catch (error) {
-            console.error("Erro ao recuperar presentes", error);
+            console.error('Erro ao recuperar presentes', error)
             toast('Erro ao recuperar presentes', toastError)
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
     const abrirModal = (presente: Presente) => {
-        setPresenteSelecionado(presente);
-        setModalVisible(true);
-        document.body.style.overflow = "hidden";
-    };
+        setPresenteSelecionado(presente)
+        setModalVisible(true)
+        document.body.style.overflow = 'hidden'
+    }
 
     const fecharModal = () => {
-        setModalVisible(false);
-        setPresenteSelecionado(null);
-        setQuantidadePresentear(1);
-        document.body.style.overflow = "auto";
-    };
+        setModalVisible(false)
+        setPresenteSelecionado(null)
+        setQuantidadePresentear(1)
+        document.body.style.overflow = 'auto'
+    }
 
     const confirmarPresentear = async () => {
         try {
             if (!presenteSelecionado) {
-                toast("Nenhum presente selecionado.", toastError);
-                return;
+                toast('Nenhum presente selecionado.', toastError)
+                return
             }
 
-            const result = localStorage.getItem("luna-storage-gifts");
-            const presentesUsuario = result ? JSON.parse(result) : [];
+            const result = localStorage.getItem('luna-storage-gifts')
+            const presentesUsuario = result ? JSON.parse(result) : []
             localStorage.removeItem('luna-storage-gifts')
 
-            let presenteExiste = false;
+            let presenteExiste = false
 
             const newArrPresentes = presentesUsuario.map((presentePresenteado: PresentePresenteado) => {
                 if (presentePresenteado.presente.id === presenteSelecionado.id) {
-                    presenteExiste = true;
+                    presenteExiste = true
                     return {
                         ...presentePresenteado,
                         quantidadePresenteado: quantidadePresentear,
-                    };
+                    }
                 }
-                return presentePresenteado;
-            });
+                return presentePresenteado
+            })
 
             if (!presenteExiste) {
                 newArrPresentes.push({
                     presente: presenteSelecionado,
                     quantidadePresenteado: quantidadePresentear,
-                });
+                })
             }
 
             if (presenceId) {
@@ -125,42 +125,42 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                     presenceId,
                     giftId: presentePresenteado.presente.id,
                     quantity: presentePresenteado.quantidadePresenteado,
-                }));
+                }))
 
                 try {
                     const giftResponse = await fetch(
                         `${process.env.NEXT_PUBLIC_URL_API}/presenceGift`,
                         {
                             headers: {
-                                "Content-Type": "application/json",
+                                'Content-Type': 'application/json',
                             },
-                            method: "POST",
+                            method: 'POST',
                             body: JSON.stringify(presenceGifts),
                         }
-                    );
+                    )
 
                     if (!giftResponse.ok) {
-                        const errorData = await giftResponse.json();
-                        throw new Error(errorData.message || "Erro ao salvar os presentes.");
+                        const errorData = await giftResponse.json()
+                        throw new Error(errorData.message || 'Erro ao salvar os presentes.')
                     }
 
-                    toast("Presenteado!", toastSuccess);
-                    getGifts();
+                    toast('Presenteado!', toastSuccess)
+                    getGifts()
                 } catch (fetchError) {
-                    console.error("Erro ao salvar presentes na API:", fetchError);
-                    toast("Erro ao salvar os presentes. Tente novamente.", toastError);
+                    console.error('Erro ao salvar presentes na API:', fetchError)
+                    toast('Erro ao salvar os presentes. Tente novamente.', toastError)
                 }
             } else {
-                localStorage.setItem("luna-storage-gifts", JSON.stringify(newArrPresentes));
-                acao("presenca-e");
+                localStorage.setItem('luna-storage-gifts', JSON.stringify(newArrPresentes))
+                acao('presenca-e')
             }
 
-            fecharModal();
+            fecharModal()
         } catch (error) {
-            console.error("Erro ao confirmar presentear:", error);
-            toast("Ocorreu um erro inesperado. Tente novamente.", toastError);
+            console.error('Erro ao confirmar presentear:', error)
+            toast('Ocorreu um erro inesperado. Tente novamente.', toastError)
         }
-    };
+    }
 
     return (
         <div className="flex flex-col items-center justify-start min-h-screen px-4 gap-3">
@@ -269,5 +269,5 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                 )
             }
         </div >
-    );
+    )
 }

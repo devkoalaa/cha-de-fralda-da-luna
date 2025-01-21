@@ -1,8 +1,8 @@
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import Slider, { Settings } from "react-slick";
-import "slick-carousel/slick/slick-theme.css";
-import "slick-carousel/slick/slick.css";
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import Slider, { Settings } from 'react-slick'
+import 'slick-carousel/slick/slick-theme.css'
+import 'slick-carousel/slick/slick.css'
 
 const settings: Settings = {
     dots: false,
@@ -12,24 +12,24 @@ const settings: Settings = {
     autoplaySpeed: 3000,
     arrows: false,
     draggable: false,
-    className: "slider-container",
-};
+    className: 'slider-container',
+}
 
 const arrHPhotos = ['/images/carrossel-h1.jpg', '/images/carrossel-h2.jpg', '/images/carrossel-h3.jpg']
 const arrVhotos = ['/images/carrossel-v1.jpg', '/images/carrossel-v2.jpg', '/images/carrossel-v3.jpg', '/images/carrossel-v4.jpg']
 
 export default function Convite() {
-    const [isMobile, setIsMobile] = useState(false);
+    const [isMobile, setIsMobile] = useState(false)
 
     useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth <= 640);
+        const handleResize = () => setIsMobile(window.innerWidth <= 640)
 
-        handleResize();
+        handleResize()
 
-        window.addEventListener("resize", handleResize);
+        window.addEventListener('resize', handleResize)
 
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     return (
         <div className="flex flex-col items-center justify-start min-h-screen px-4">
@@ -77,5 +77,5 @@ export default function Convite() {
             </p>
             <p className="text-lg text-gray-700">Aguardamos vocês!</p>
         </div >
-    );
+    )
 }

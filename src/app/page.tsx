@@ -1,20 +1,20 @@
 'use client'
-import Convite from "@/components/convite";
-import Evento from '@/components/evento';
-import Presenca from "@/components/presenca";
-import Presentes from "@/components/presentes";
-import { AnimatePresence, motion } from 'framer-motion';
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { IoMenu } from "react-icons/io5";
+import Convite from '@/components/convite'
+import Evento from '@/components/evento'
+import Presenca from '@/components/presenca'
+import Presentes from '@/components/presentes'
+import { AnimatePresence, motion } from 'framer-motion'
+import Image from 'next/image'
+import { useEffect, useState } from 'react'
+import { IoMenu } from 'react-icons/io5'
 
 export default function Home() {
   const [screenSelected, setScreenSelected] = useState(() => {
     // const lastScreen = localStorage.getItem('luna-storage-last-screen')
     // if (lastScreen) return lastScreen
     return 'home'
-  });
-  const [menuOpen, setMenuOpen] = useState(false);
+  })
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const lastScreen = localStorage.getItem('luna-storage-last-screen')
@@ -148,5 +148,5 @@ export default function Home() {
         </main>
       </div>
     </div>
-  );
+  )
 }
