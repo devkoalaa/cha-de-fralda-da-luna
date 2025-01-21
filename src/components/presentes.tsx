@@ -148,7 +148,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                     getGifts()
                 } catch (fetchError) {
                     console.error('Erro ao salvar presentes na API:', fetchError)
-                    toast('Erro ao salvar os presentes. Tente novamente.', toastError)
+                    toast('Erro ao salvar os presentes.', toastError)
                 }
             } else {
                 localStorage.setItem('luna-storage-gifts', JSON.stringify(newArrPresentes))
@@ -158,7 +158,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
             fecharModal()
         } catch (error) {
             console.error('Erro ao confirmar presentear:', error)
-            toast('Ocorreu um erro inesperado. Tente novamente.', toastError)
+            toast('Ocorreu um erro inesperado.', toastError)
         }
     }
 
@@ -250,16 +250,16 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                                 />
                             </div>
 
-                            <div className="flex justify-end gap-4">
+                            <div className="flex justify-between space-x-2">
                                 <button
                                     onClick={fecharModal}
-                                    className="bg-gray-500 text-white text-sm py-2 px-4 rounded-md hover:bg-gray-600 transition-colors"
+                                    className="flex-1 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition-colors duration-200"
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     onClick={confirmarPresentear}
-                                    className="bg-verde text-white text-sm py-2 px-4 rounded-md hover:bg-verde-escuro transition-colors"
+                                    className="flex-1 bg-verde text-white py-2 px-4 rounded-md hover:bg-verde-escuro transition-colors duration-200"
                                 >
                                     Confirmar
                                 </button>

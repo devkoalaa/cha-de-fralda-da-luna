@@ -70,11 +70,11 @@ export default function Convidados() {
         {convidados.length > 0 &&
           (isMobile ? (
             <div className="py-4 w-full">
-               <div className="border border-marronzim rounded-lg p-4 m-4 bg-gray-200">
+              <div className="border border-marronzim rounded-lg p-4 m-4 bg-gray-200">
                 <p>Total de Convidados: {totalConvidados}</p>
                 <p>
-                  Total de Acompanhantes: {totalAcompanhantesAdultos} Adultos,{' '}
-                  {totalAcompanhantesCriancas} Crianças
+                  Total de Acompanhantes: {totalAcompanhantesAdultos} adultos,{' '}
+                  {totalAcompanhantesCriancas} crianças
                 </p>
                 <p>Total de Presentes: {totalPresentes}</p>
               </div>
@@ -92,8 +92,8 @@ export default function Convidados() {
                     })}
                   </p>
                   <p>
-                    Acompanhantes: {convidado.acompanhantesAdultos} Adultos,{' '}
-                    {convidado.acompanhantesCriancas} Crianças
+                    Acompanhantes: {convidado.acompanhantesAdultos} adulto{convidado.acompanhantesAdultos != 1 && 's'},{' '}
+                    {convidado.acompanhantesCriancas} criança{convidado.acompanhantesCriancas != 1 && 's'}
                   </p>
                   <div>
                     <h4 className="font-bold">Presentes:</h4>
@@ -156,8 +156,8 @@ export default function Convidados() {
                         })}
                       </td>
                       <td className="px-4 py-2 border-b text-sm md:text-base">
-                        {convidado.acompanhantesAdultos} Adultos,{' '}
-                        {convidado.acompanhantesCriancas} Crianças
+                        {convidado.acompanhantesAdultos} adulto{convidado.acompanhantesAdultos != 1 && 's'},{' '}
+                        {convidado.acompanhantesCriancas} criança{convidado.acompanhantesCriancas != 1 && 's'}
                       </td>
                       {convidado.selectedGifts.length > 0 ? (
                         <td className="px-4 py-2 border-b text-sm md:text-base">
@@ -186,7 +186,7 @@ export default function Convidados() {
                     </td>
                     <td className="px-4 py-2 text-sm md:text-base border-t-2 border-marronzim"></td>
                     <td className="px-4 py-2 text-sm md:text-base border-t-2 border-marronzim">
-                      {totalAcompanhantesAdultos} Adultos, {totalAcompanhantesCriancas} Crianças
+                      {totalAcompanhantesAdultos} adultos, {totalAcompanhantesCriancas} crianças
                     </td>
                     <td className="px-4 py-2 text-sm md:text-base border-t-2 border-marronzim">
                       {totalPresentes} Presentes
