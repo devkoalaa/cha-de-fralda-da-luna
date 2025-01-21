@@ -86,7 +86,7 @@ export default function Convidados() {
                   <h3 className="font-bold text-lg">{convidado.name}</h3>
                   <p>Telefone: {convidado.phone}</p>
                   <p>
-                    Data de Criação:{' '}
+                    Data da Confirmação:{' '}
                     {new Date(convidado.createdAt).toLocaleString('pt-BR', {
                       timeZone: 'America/Sao_Paulo',
                     })}
@@ -131,7 +131,7 @@ export default function Convidados() {
                       Telefone
                     </th>
                     <th className="px-4 py-2 text-left text-white bg-verde border-marronzim border-t-2">
-                      Data de Criação
+                      Data da Confirmação
                     </th>
                     <th className="px-4 py-2 text-left text-white bg-verde border-marronzim border-t-2">
                       Acompanhantes
