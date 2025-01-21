@@ -70,6 +70,14 @@ export default function Convidados() {
         {convidados.length > 0 &&
           (isMobile ? (
             <div className="py-4 w-full">
+               <div className="border border-marronzim rounded-lg p-4 m-4 bg-gray-200">
+                <p>Total de Convidados: {totalConvidados}</p>
+                <p>
+                  Total de Acompanhantes: {totalAcompanhantesAdultos} Adultos,{' '}
+                  {totalAcompanhantesCriancas} Crianças
+                </p>
+                <p>Total de Presentes: {totalPresentes}</p>
+              </div>
               {convidados.map((convidado, index) => (
                 <div
                   key={index}
