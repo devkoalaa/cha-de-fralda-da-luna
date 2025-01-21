@@ -293,6 +293,9 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
         if (!presente || !presenca) return
 
         try {
+            if (!quantidadePresentear || quantidadePresentear <= 0) {
+                throw new Error('Quantidade inválida para o presente.')
+            }
 
             const body = {
                 presenceId: presenca.id,
@@ -322,6 +325,8 @@ export default function Presenca({ acao, tag }: { acao: (tela: string) => void, 
                 console.error('Erro desconhecido', error)
                 toast('Ocorreu um erro inesperado.', toastError)
             }
+        } finally {
+            setGiftModalVisible(false)
         }
     }
 
