@@ -191,7 +191,7 @@ export default function Presentes({ acao }: { acao: (tela: string) => void }) {
                                     {presente.descricao}
                                 </p>
                                 <div className="flex flex-grow flex-col justify-between w-full">
-                                    <p className="text-black mb-2 font-bold">Quantidade desejada:{presente.quantidade === 0 ? <span className="text-2xl leading-none relative left-1 top-[4px]">∞</span> : presente.quantidade} </p>
+                                    <p className="text-black mb-2 font-bold">Quantidade desejada: {presente.quantidade === 0 ? <span className="text-2xl leading-none relative left-1 top-[4px]">∞</span> : presente.quantidade} </p>
                                     <p className="text-black mb-4 font-bold">Quantidade presenteada: {presente.quantidadeComprado}</p>
                                     <button className="bg-marronzim text-white py-2 px-4 rounded-md hover:bg-marronzim-escuro transition-colors duration-200">
                                         Presentear

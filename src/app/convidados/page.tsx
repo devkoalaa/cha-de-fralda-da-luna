@@ -55,10 +55,9 @@ export default function Convidados() {
     >
       <div className="flex flex-col items-center justify-between font-[family-name:var(--font-geist-sans)] rounded-xl w-full m-0.8">
         <div
-          className="top-0 left-0 w-full flex flex-col items-center px-9"
-          onClick={() => router.replace('/')}
-        >
+          className="top-0 left-0 w-full flex flex-col items-center px-9">
           <Image
+            onClick={() => router.replace('/')}
             src="/images/lunaLogo.png"
             alt="Luna logo"
             width={200}
