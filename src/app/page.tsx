@@ -1,5 +1,7 @@
 'use client'
 
+import Image from 'next/image'
+
 export default function Home() {
   // const [screenSelected, setScreenSelected] = useState(() => {
   //   // const lastScreen = localStorage.getItem('luna-storage-last-screen')
@@ -145,6 +147,17 @@ export default function Home() {
   return (
     <div className="flex items-center justify-center min-h-screen border-marronzim border-solid border-8 rounded-2xl lg:bg-cover lg:bg-center" style={{ backgroundImage: 'url(/images/background.png)' }}>
       <div className="flex flex-col items-center justify-between font-[family-name:var(--font-geist-sans)] rounded-xl w-full m-0.8">
+
+        <div className="top-0 left-0 w-full flex flex-col items-center px-9">
+          <Image
+            src="/images/lunaLogo.png"
+            alt="Luna logo"
+            width={300}
+            height={300}
+            priority
+            className="mb-3 md:mb-6"
+          />
+        </div>
 
         <main className="flex flex-col w-full h-full max-w-4xl p-6 overflow-auto">
           <h1 className="text-3xl font-bold text-marrozim mt-5">
