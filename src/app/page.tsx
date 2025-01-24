@@ -160,7 +160,7 @@ export default function Home() {
           </p>
           <p className="text-lg text-gray-700 mt-4">
             Com amor,
-            Victor e Luana
+            Victor e Luana.
           </p>
         </main>
       </div>
