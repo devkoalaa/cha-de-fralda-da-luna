@@ -57,7 +57,7 @@ export default function Convidados() {
         <div
           className="top-0 left-0 w-full flex flex-col items-center px-9">
           <Image
-            onClick={() => router.replace('/')}
+            onClick={() => router.replace('/main')}
             src="/images/lunaLogo.png"
             alt="Luna logo"
             width={200}
